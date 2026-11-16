@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rivjuuu · Navigation architecture</title>
+<link rel="stylesheet" href="assets/rivjuuu.css">
+</head>
+<body class="pv">
+<main class="pv-main pv-main--wide">
+<div class="pv-wide" id="mount"></div>
+</main>
+<template id="tpl">
+<div class="ia" style="width: 1080px; height: 1000px">
+<h1>Navigation architecture</h1>
+<div class="ia__cols">
+
+<div class="ia__col">
+<h2>Customer</h2>
+<div class="ia__nav"><nav class="rv-nav" aria-label="Customer"><span class="rv-nav__item is-active"><i class="ic ic-home"></i>Home</span><span class="rv-nav__item"><i class="ic ic-compass"></i>Explore</span><span class="rv-nav__item"><i class="ic ic-award"></i>Rewards</span><span class="rv-nav__item"><i class="ic ic-activity"></i>Activity</span><span class="rv-nav__item"><i class="ic ic-user"></i>Profile</span></nav></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-home ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Home</b><span class="batch">Batch 3</span></div><p>Recommended, highlighted and nearby restaurants, categories, offers, giveaways</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-compass ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Explore</b><span class="batch">Batch 3</span></div><p>Search, categories, restaurant listing, map / list discovery</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-award ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Rewards</b><span class="batch">Batch 5–6</span></div><p>Loyalty per restaurant, coupons, reward activity</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-activity ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Activity</b><span class="batch">Batch 5 · 7 · 8</span></div><p>Coupon history, giveaway entries and results, review activity</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-user ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Profile</b><span class="batch">Batch 9–10</span></div><p>Profile, friends, privacy, notifications, settings</p></div></div>
+</div>
+
+<div class="ia__col">
+<h2>Restaurant</h2>
+<div class="ia__nav"><nav class="rv-nav" aria-label="Restaurant"><span class="rv-nav__item is-active"><i class="ic ic-dashboard"></i>Dashboard</span><span class="rv-nav__item"><i class="ic ic-ticket"></i>Coupons</span><span class="rv-nav__item"><i class="ic ic-scan"></i>Scan</span><span class="rv-nav__item"><i class="ic ic-activity"></i>Activity</span><span class="rv-nav__item"><i class="ic ic-user"></i>Profile</span></nav></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-dashboard ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Dashboard</b><span class="batch">Batch 12</span></div><p>Summary, active coupons, redemptions, loyalty activity, subscription status, quick actions</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-ticket ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Coupons</b><span class="batch">Batch 13</span></div><p>Active, expired and inactive coupons; create and edit</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-scan ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Scan</b><span class="batch">Batch 14</span></div><p>QR scanner and redemption validation</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-activity ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Activity</b><span class="batch">Batch 12 · 15</span></div><p>Redemptions, loyalty and giveaway activity, customer-related activity, statistics entry points</p></div></div>
+<div class="tabrow"><span class="tabrow__icon"><i class="ic ic-user ic-20"></i></span><div class="tabrow__body"><div class="tabrow__top"><b>Profile</b><span class="batch">Batch 11 · 13 · 16</span></div><p>Restaurant profile, menu, subscription, account and settings</p></div></div>
+</div>
+
+</div>
+</div>
+</template>
+<script src="assets/rivjuuu.js"></script>
+<script>
+var PROPS = {"$preview":{"width":1080,"height":1000}};
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+Rivjuuu.mount(PROPS, Component);
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/map_bloc.dart';
+import 'map_view.dart';
+
+class MapPage extends StatelessWidget {
+  final String? initialSelectedName;
+
+  const MapPage({
+    super.key,
+    this.initialSelectedName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => MapBloc(initialSelectedName: initialSelectedName),
+      child: const MapView(),
+    );
+  }
+}
+
