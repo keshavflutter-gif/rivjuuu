@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/routes/app_router.dart';
 import '../bloc/restaurant_signup_bloc.dart';
@@ -129,11 +130,17 @@ class _RestaurantSignupFlowPageState extends State<RestaurantSignupFlowPage> {
                             SubmissionStatus.failure) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
+                              duration: const Duration(seconds: 2),
                               content: Text(
                                 state.errorMessage ??
                                     'Submission failed. Please try again.',
+                                style: GoogleFonts.poppins(color: Colors.white),
                               ),
-                              backgroundColor: AppColors.navy,
+                              backgroundColor: const Color(0xFFE03131),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           );
                         }

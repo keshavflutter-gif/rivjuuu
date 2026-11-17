@@ -8,13 +8,17 @@ class RestaurantRegistrationData {
 
   String restaurantName;
   String category;
+  String categoryId;
   String address;
+  String city;
   String locationLabel;
 
   String businessDetail;
   String? uploadedFileName;
 
   bool agreedToTerms;
+  String? restaurantId;
+  String? approvalStatus;
 
   RestaurantRegistrationData({
     this.ownerName = '',
@@ -23,11 +27,15 @@ class RestaurantRegistrationData {
     this.confirmPassword = '',
     this.restaurantName = '',
     this.category = '',
+    this.categoryId = '',
     this.address = '',
+    this.city = 'Budapest',
     this.locationLabel = 'Set location on map',
     this.businessDetail = '',
     this.uploadedFileName,
     this.agreedToTerms = false,
+    this.restaurantId,
+    this.approvalStatus,
   });
 
   RestaurantSignupState toBlocState({int stepIndex = 0}) {
@@ -39,11 +47,15 @@ class RestaurantRegistrationData {
       confirmPassword: confirmPassword,
       restaurantName: restaurantName,
       restaurantCategory: category,
+      categoryId: categoryId,
       restaurantAddress: address,
+      city: city,
       locationLabel: locationLabel,
       businessDetails: businessDetail,
       supportingDocument: uploadedFileName,
       termsAccepted: agreedToTerms,
+      registeredRestaurantId: restaurantId,
+      approvalStatus: approvalStatus,
     );
   }
 
@@ -55,11 +67,15 @@ class RestaurantRegistrationData {
       confirmPassword: state.confirmPassword,
       restaurantName: state.restaurantName,
       category: state.restaurantCategory,
+      categoryId: state.categoryId,
       address: state.restaurantAddress,
+      city: state.city,
       locationLabel: state.locationLabel ?? 'Set location on map',
       businessDetail: state.businessDetails,
       uploadedFileName: state.supportingDocument,
       agreedToTerms: state.termsAccepted,
+      restaurantId: state.registeredRestaurantId,
+      approvalStatus: state.approvalStatus,
     );
   }
 }

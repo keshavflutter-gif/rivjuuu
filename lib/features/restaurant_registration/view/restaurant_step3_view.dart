@@ -40,10 +40,17 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
     bloc.add(const SupportingDocumentChanged(fileName));
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Uploaded: $fileName'),
-        duration: Duration(seconds: 1),
-        backgroundColor: AppColors.navy,
+      SnackBar(
+        duration: const Duration(seconds: 2),
+        content: Text(
+          'Uploaded: $fileName',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF1F7A45),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }

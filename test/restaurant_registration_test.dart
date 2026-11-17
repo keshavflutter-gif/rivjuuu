@@ -17,21 +17,63 @@ import 'package:rivjuuu/features/restaurant_coupons/view/restaurant_coupon_form_
 import 'package:rivjuuu/features/restaurant_coupons/view/restaurant_coupon_detail_page.dart';
 import 'package:rivjuuu/features/restaurant_scanner/view/restaurant_scanner_page.dart';
 import 'package:rivjuuu/features/restaurant_scanner/view/restaurant_scan_result_page.dart';
+import 'package:rivjuuu/data/models/restaurant/restaurant_category_model.dart';
+import 'package:rivjuuu/data/models/restaurant/restaurant_register_response.dart';
 import 'package:rivjuuu/features/restaurant_profile/view/restaurant_account_page.dart';
 import 'package:rivjuuu/features/restaurant_profile/view/restaurant_menu_manage_page.dart';
 
 class FailingMockRestaurantRepository implements RestaurantSignupRepository {
   @override
-  Future<void> submitRegistration(RestaurantSignupState state) async {
+  Future<RestaurantRegisterResponse> submitRegistration(
+      RestaurantSignupState state) async {
     throw Exception('Network error: Failed to submit registration');
   }
+
+  @override
+  Future<List<RestaurantCategoryModel>> getCategories() async => const [
+        RestaurantCategoryModel(
+          id: 'f47b6f52-53b3-4a10-a572-dc1687b37315',
+          slug: 'italian',
+          name: 'Italian',
+          description: 'Authentic Italian cuisine',
+        ),
+        RestaurantCategoryModel(
+          id: 'b7e2323a-90b3-4781-9642-2bf311a7eaa2',
+          slug: 'burger',
+          name: 'Burger',
+          description: 'Burgers, fries, and street food',
+        ),
+      ];
 }
 
-class FastSuccessMockRestaurantRepository implements RestaurantSignupRepository {
+class FastSuccessMockRestaurantRepository
+    implements RestaurantSignupRepository {
   @override
-  Future<void> submitRegistration(RestaurantSignupState state) async {
-    // Immediate success without delay for fast test execution
+  Future<RestaurantRegisterResponse> submitRegistration(
+      RestaurantSignupState state) async {
+    return const RestaurantRegisterResponse(
+      success: 1,
+      message:
+          'Restaurant application submitted successfully and is pending approval',
+      approvalStatus: 'PENDING',
+    );
   }
+
+  @override
+  Future<List<RestaurantCategoryModel>> getCategories() async => const [
+        RestaurantCategoryModel(
+          id: 'f47b6f52-53b3-4a10-a572-dc1687b37315',
+          slug: 'italian',
+          name: 'Italian',
+          description: 'Authentic Italian cuisine',
+        ),
+        RestaurantCategoryModel(
+          id: 'b7e2323a-90b3-4781-9642-2bf311a7eaa2',
+          slug: 'burger',
+          name: 'Burger',
+          description: 'Burgers, fries, and street food',
+        ),
+      ];
 }
 
 void main() {
@@ -63,7 +105,7 @@ void main() {
       expect(find.text('Step 1 of 4'), findsOneWidget);
     });
 
-    testWidgets('Step navigation without validation blocks: moves smoothly from Step 1 to Step 2', (tester) async {
+    testWidgets('Step 1 validation blocks invalid inputs and advances smoothly with valid data', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -79,13 +121,24 @@ void main() {
       expect(find.text('Account information'), findsOneWidget);
       expect(find.text('Step 1 of 4'), findsOneWidget);
 
-      // Enter sample test inputs
-      final textFields = find.byType(TextField);
-      await tester.enterText(textFields.at(0), 'Márton');
-      await tester.enterText(textFields.at(1), 'a');
+      // Tap continue with empty inputs -> blocked by validation
+      await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
 
-      // Tap continue without being blocked by email or password validation
+      expect(find.text('Owner or contact name is required'), findsOneWidget);
+      expect(find.text('Email address is required'), findsOneWidget);
+      expect(find.text('Password is required'), findsOneWidget);
+      expect(find.text('Restaurant information'), findsNothing);
+
+      // Enter valid inputs
+      final textFields = find.byType(TextField);
+      await tester.enterText(textFields.at(0), 'Márton Szabó');
+      await tester.enterText(textFields.at(1), 'hello@nonnarosa.hu');
+      await tester.enterText(textFields.at(2), 'Password123');
+      await tester.enterText(textFields.at(3), 'Password123');
+      await tester.pumpAndSettle();
+
+      // Tap continue with valid data
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
 
@@ -276,6 +329,10 @@ void main() {
       // ----------------------------------------
       final submitButton = find.widgetWithText(ElevatedButton, 'Submit application');
       expect(submitButton, findsOneWidget);
+
+      // Accept terms
+      await tester.tap(find.byKey(const Key('termsCheckbox')));
+      await tester.pumpAndSettle();
 
       // Submit application
       await tester.tap(submitButton);

@@ -57,10 +57,23 @@ class RestaurantNameChanged extends RestaurantSignupEvent {
 
 class RestaurantCategoryChanged extends RestaurantSignupEvent {
   final String category;
-  const RestaurantCategoryChanged(this.category);
+  final String categoryId;
+  const RestaurantCategoryChanged(this.category, {this.categoryId = ''});
 
   @override
-  List<Object?> get props => [category];
+  List<Object?> get props => [category, categoryId];
+}
+
+class RestaurantCityChanged extends RestaurantSignupEvent {
+  final String city;
+  const RestaurantCityChanged(this.city);
+
+  @override
+  List<Object?> get props => [city];
+}
+
+class FetchCategoriesRequested extends RestaurantSignupEvent {
+  const FetchCategoriesRequested();
 }
 
 class RestaurantAddressChanged extends RestaurantSignupEvent {

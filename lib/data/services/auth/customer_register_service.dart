@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_endpoints.dart';
 import '../../../core/api/api_exception.dart';
@@ -9,7 +10,7 @@ class CustomerRegisterService {
   final ApiClient _apiClient;
 
   CustomerRegisterService({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+    : _apiClient = apiClient ?? ApiClient();
 
   /// Executes POST /auth/register/customer
   Future<CustomerRegisterResponse> registerCustomer(
@@ -43,10 +44,7 @@ class CustomerRegisterService {
       throw ApiException.fromDioException(dioError);
     } catch (e) {
       if (e is ApiException) rethrow;
-      throw ApiException(
-        message: e.toString(),
-      );
+      throw ApiException(message: e.toString());
     }
   }
 }
-

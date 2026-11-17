@@ -8,6 +8,7 @@ import '../../../core/constants/app_messages.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/utils/validators.dart';
+import '../../restaurant_registration/models/restaurant_registration_data.dart';
 import '../bloc/login_bloc.dart';
 import '../bloc/login_event.dart';
 import '../bloc/login_state.dart';
@@ -99,28 +100,95 @@ class _LoginViewState extends State<LoginView> {
               });
             }
           } else if (state is LoginSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                duration: const Duration(seconds: 2),
-                content: Text(
-                  state.response.message.isNotEmpty
-                      ? state.response.message
-                      : AppMessages.loginSuccess,
-                  style: GoogleFonts.poppins(color: Colors.white),
-                ),
-                backgroundColor: const Color(0xFF1F7A45),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
+            final response = state.response;
+            final role =
+                (response.role ?? response.user?.role ?? '').toUpperCase();
 
-            // Navigate to Customer Home Screen, clearing backstack
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              AppRoutes.home,
-              (route) => false,
-            );
+            void showSuccessSnackBar() {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: const Duration(seconds: 2),
+                  content: Text(
+                    state.response.message.isNotEmpty
+                        ? state.response.message
+                        : AppMessages.loginSuccess,
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                  backgroundColor: const Color(0xFF1F7A45),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }
+
+            if (role == 'RESTAURANT') {
+              String approvalStatus = 'PENDING';
+              String restaurantName = 'Trattoria Nonna Rosa';
+              String restaurantCategory = 'Italian';
+              String restaurantAddress = 'Fő utca 12, Hungary';
+              String restaurantCity = 'Budapest';
+
+              final restaurants = response.user?.restaurants;
+              if (restaurants != null &&
+                  restaurants.isNotEmpty &&
+                  restaurants.first is Map) {
+                final rest = restaurants.first as Map<String, dynamic>;
+                approvalStatus =
+                    (rest['approvalStatus'] as String? ?? 'PENDING')
+                        .toUpperCase();
+                restaurantName = rest['name'] as String? ?? restaurantName;
+                restaurantCategory =
+                    rest['category'] as String? ?? restaurantCategory;
+                restaurantAddress =
+                    rest['address'] as String? ?? restaurantAddress;
+                restaurantCity = rest['city'] as String? ?? restaurantCity;
+              }
+
+              final regData = RestaurantRegistrationData(
+                ownerName:
+                    '${response.user?.firstName ?? ''} ${response.user?.lastName ?? ''}'
+                        .trim(),
+                email: response.user?.email ?? _emailController.text.trim(),
+                restaurantName: restaurantName,
+                category: restaurantCategory,
+                address: restaurantAddress,
+                city: restaurantCity,
+                approvalStatus: approvalStatus,
+              );
+
+              if (approvalStatus == 'APPROVED') {
+                showSuccessSnackBar();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.restaurantDashboard,
+                  (route) => false,
+                  arguments: regData,
+                );
+              } else if (approvalStatus == 'REJECTED' ||
+                  approvalStatus == 'NOT_APPROVED') {
+                ScaffoldMessenger.of(context).clearSnackBars();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.registrationRejected,
+                  (route) => false,
+                  arguments: regData,
+                );
+              } else {
+                ScaffoldMessenger.of(context).clearSnackBars();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.registrationPending,
+                  (route) => false,
+                  arguments: regData,
+                );
+              }
+            } else {
+              showSuccessSnackBar();
+              // Navigate to Customer Home Screen, clearing backstack
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.home,
+                (route) => false,
+              );
+            }
           }
         },
         child: Scaffold(
@@ -530,8 +598,9 @@ class _LoginViewState extends State<LoginView> {
                       SizedBox(height: 20 * scale),
 
                       // Sign up text
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             AppStrings.newToRivjuuu,

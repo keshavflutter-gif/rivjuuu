@@ -7,6 +7,12 @@ class ApiEndpoints {
   /// Customer Registration Endpoint
   static const String registerCustomer = '/auth/register/customer';
 
+  /// Restaurant Registration Endpoint
+  static const String registerRestaurant = '/auth/register/restaurant';
+
+  /// Restaurant Category Endpoint
+  static const String restaurantCategory = '/restaurant-category';
+
   /// Login Endpoint
   static const String login = '/auth/login';
 
@@ -15,6 +21,8 @@ class ApiEndpoints {
 
   /// Helper to get full URLs
   static String get fullRegisterCustomerUrl => '$baseUrl$registerCustomer';
+  static String get fullRegisterRestaurantUrl => '$baseUrl$registerRestaurant';
+  static String get fullRestaurantCategoryUrl => '$baseUrl$restaurantCategory';
   static String get fullLoginUrl => '$baseUrl$login';
   static String get fullLogoutUrl => '$baseUrl$logout';
 

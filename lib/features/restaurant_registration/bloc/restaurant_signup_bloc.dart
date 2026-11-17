@@ -8,13 +8,13 @@ class RestaurantSignupBloc
     extends Bloc<RestaurantSignupEvent, RestaurantSignupState> {
   final RestaurantSignupRepository _repository;
 
-  // static final RegExp _emailRegex =
-  //     RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+  static final RegExp _emailRegex =
+      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
   RestaurantSignupBloc({
     RestaurantSignupState? initialState,
     RestaurantSignupRepository? repository,
-  })  : _repository = repository ?? const DefaultRestaurantSignupRepository(),
+  })  : _repository = repository ?? DefaultRestaurantSignupRepository(),
         super(initialState ?? const RestaurantSignupState()) {
     on<OwnerNameChanged>(_onOwnerNameChanged);
     on<EmailChanged>(_onEmailChanged);
@@ -25,6 +25,7 @@ class RestaurantSignupBloc
     on<RestaurantNameChanged>(_onRestaurantNameChanged);
     on<RestaurantCategoryChanged>(_onRestaurantCategoryChanged);
     on<RestaurantAddressChanged>(_onRestaurantAddressChanged);
+    on<RestaurantCityChanged>(_onRestaurantCityChanged);
     on<RestaurantLocationChanged>(_onRestaurantLocationChanged);
     on<BusinessDetailsChanged>(_onBusinessDetailsChanged);
     on<SupportingDocumentChanged>(_onSupportingDocumentChanged);
@@ -35,6 +36,7 @@ class RestaurantSignupBloc
     on<PreviousStepRequested>(_onPreviousStepRequested);
     on<GoToStepRequested>(_onGoToStepRequested);
     on<SubmitApplicationRequested>(_onSubmitApplicationRequested);
+    on<FetchCategoriesRequested>(_onFetchCategoriesRequested);
   }
 
   void _onOwnerNameChanged(
@@ -122,6 +124,20 @@ class RestaurantSignupBloc
       ..remove('restaurantCategory');
     emit(state.copyWith(
       restaurantCategory: event.category,
+      categoryId:
+          event.categoryId.isNotEmpty ? event.categoryId : state.categoryId,
+      validationErrors: errors,
+    ));
+  }
+
+  void _onRestaurantCityChanged(
+    RestaurantCityChanged event,
+    Emitter<RestaurantSignupState> emit,
+  ) {
+    final errors = Map<String, String>.from(state.validationErrors)
+      ..remove('city');
+    emit(state.copyWith(
+      city: event.city,
       validationErrors: errors,
     ));
   }
@@ -196,8 +212,73 @@ class RestaurantSignupBloc
   }
 
   Map<String, String> _validateStep(int stepIndex) {
-    // Validation temporarily disabled per user request
-    return <String, String>{};
+    final errors = <String, String>{};
+
+    switch (stepIndex) {
+      case 0: // Step 1: Account information
+        if (state.ownerName.trim().isEmpty) {
+          errors['ownerName'] = 'Owner or contact name is required';
+        } else if (state.ownerName.trim().length < 2) {
+          errors['ownerName'] = 'Please enter a valid full name';
+        }
+
+        if (state.email.trim().isEmpty) {
+          errors['email'] = 'Email address is required';
+        } else if (!_emailRegex.hasMatch(state.email.trim())) {
+          errors['email'] = 'Please enter a valid email address';
+        }
+
+        if (state.password.isEmpty) {
+          errors['password'] = 'Password is required';
+        } else if (state.password.length < 8) {
+          errors['password'] = 'Password must be at least 8 characters';
+        } else if (state.password.trim().isEmpty) {
+          errors['password'] = 'Password cannot be empty or only whitespace';
+        }
+
+        if (state.confirmPassword.isEmpty) {
+          errors['confirmPassword'] = 'Please confirm your password';
+        } else if (state.confirmPassword != state.password) {
+          errors['confirmPassword'] = 'Passwords do not match';
+        }
+        break;
+
+      case 1: // Step 2: Restaurant information
+        if (state.restaurantName.trim().isEmpty) {
+          errors['restaurantName'] = 'Restaurant name is required';
+        } else if (state.restaurantName.trim().length < 2) {
+          errors['restaurantName'] = 'Please enter a valid restaurant name';
+        }
+
+        if (state.restaurantCategory.trim().isEmpty) {
+          errors['restaurantCategory'] = 'Please select a category';
+        }
+
+        if (state.restaurantAddress.trim().isEmpty) {
+          errors['restaurantAddress'] = 'Address is required';
+        }
+        break;
+
+      case 2: // Step 3: Business information
+        if (state.businessDetails.trim().isEmpty) {
+          errors['businessDetails'] = 'Business detail is required';
+        }
+
+        if (state.supportingDocument == null ||
+            state.supportingDocument!.trim().isEmpty) {
+          errors['supportingDocument'] = 'Please upload a supporting document';
+        }
+        break;
+
+      case 3: // Step 4: Review and submit
+        if (!state.termsAccepted) {
+          errors['terms'] =
+              'You must agree to the Terms and Conditions and Privacy Policy';
+        }
+        break;
+    }
+
+    return errors;
   }
 
   void _onValidateStepRequested(
@@ -219,10 +300,14 @@ class RestaurantSignupBloc
     }
 
     if (state.currentStepIndex < 3) {
+      final nextStep = state.currentStepIndex + 1;
       emit(state.copyWith(
-        currentStepIndex: state.currentStepIndex + 1,
+        currentStepIndex: nextStep,
         validationErrors: const {},
       ));
+      if (nextStep == 1 && state.categories.isEmpty) {
+        add(const FetchCategoriesRequested());
+      }
     }
   }
 
@@ -247,6 +332,25 @@ class RestaurantSignupBloc
         currentStepIndex: event.stepIndex,
         validationErrors: const {},
       ));
+      if (event.stepIndex == 1 && state.categories.isEmpty) {
+        add(const FetchCategoriesRequested());
+      }
+    }
+  }
+
+  Future<void> _onFetchCategoriesRequested(
+    FetchCategoriesRequested event,
+    Emitter<RestaurantSignupState> emit,
+  ) async {
+    emit(state.copyWith(isLoadingCategories: true));
+    try {
+      final categories = await _repository.getCategories();
+      emit(state.copyWith(
+        categories: categories,
+        isLoadingCategories: false,
+      ));
+    } catch (_) {
+      emit(state.copyWith(isLoadingCategories: false));
     }
   }
 
@@ -256,18 +360,36 @@ class RestaurantSignupBloc
   ) async {
     if (state.isSubmitting) return;
 
+    final errors = <String, String>{};
+    for (int step = 0; step <= 3; step++) {
+      errors.addAll(_validateStep(step));
+    }
+
+    if (errors.isNotEmpty) {
+      emit(state.copyWith(
+        validationErrors: errors,
+        submissionStatus: SubmissionStatus.failure,
+        errorMessage: errors.values.first,
+      ));
+      return;
+    }
+
     emit(state.copyWith(
       submissionStatus: SubmissionStatus.submitting,
       clearErrorMessage: true,
     ));
 
     try {
-      await _repository.submitRegistration(state);
-      emit(state.copyWith(submissionStatus: SubmissionStatus.success));
+      final response = await _repository.submitRegistration(state);
+      emit(state.copyWith(
+        submissionStatus: SubmissionStatus.success,
+        registeredRestaurantId: response.restaurantId,
+        approvalStatus: response.approvalStatus ?? 'PENDING',
+      ));
     } catch (e) {
       emit(state.copyWith(
         submissionStatus: SubmissionStatus.failure,
-        errorMessage: e.toString(),
+        errorMessage: e.toString().replaceFirst(RegExp(r'^Exception:\s*'), ''),
       ));
     }
   }

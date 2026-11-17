@@ -256,7 +256,7 @@ void main() {
       await bloc.close();
     });
 
-    test('Unsupported role (e.g. RESTAURANT) is rejected with clear message', () async {
+    test('Unsupported role (e.g. UNKNOWN_ROLE) is rejected with clear message', () async {
       final prefs = await SharedPreferences.getInstance();
       final storage = await TokenStorageService.getInstance(prefs: prefs);
 
@@ -265,12 +265,12 @@ void main() {
           customResponse: const LoginResponse(
             success: 1,
             message: 'Login successful',
-            accessToken: 'token_for_restaurant',
-            role: 'RESTAURANT',
+            accessToken: 'token_for_unknown',
+            role: 'UNKNOWN_ROLE',
             user: LoginUser(
-              id: 'rest_user_id',
-              email: 'restaurant@example.com',
-              role: 'RESTAURANT',
+              id: 'unknown_user_id',
+              email: 'unknown@example.com',
+              role: 'UNKNOWN_ROLE',
             ),
           ),
         ),
@@ -289,7 +289,7 @@ void main() {
       expectLater(bloc.stream, emitsInOrder(expectedStates));
 
       bloc.add(const LoginSubmitted(
-        email: 'restaurant@example.com',
+        email: 'unknown@example.com',
         password: 'Password123',
       ));
 

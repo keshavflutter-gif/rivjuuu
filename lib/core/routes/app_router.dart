@@ -44,6 +44,7 @@ import '../../features/restaurant_registration/view/restaurant_step3_page.dart';
 import '../../features/restaurant_registration/view/restaurant_step4_page.dart';
 import '../../features/restaurant_registration/view/registration_pending_page.dart';
 import '../../features/restaurant_registration/view/registration_approved_page.dart';
+import '../../features/restaurant_registration/view/registration_rejected_page.dart';
 import '../../features/restaurant_registration/view/choose_plan_page.dart';
 import '../../features/restaurant_dashboard/view/restaurant_dashboard_page.dart';
 import '../../features/restaurant_coupons/view/restaurant_coupons_page.dart';
@@ -110,6 +111,7 @@ class AppRoutes {
   static const String restaurantSignUpStep4 = '/restaurant-sign-up-4';
   static const String registrationPending = '/registration-pending';
   static const String registrationApproved = '/registration-approved';
+  static const String registrationRejected = '/registration-rejected';
   static const String choosePlan = '/choose-plan';
   static const String restaurantDashboard = '/restaurant-dashboard';
   static const String restaurantCoupons = '/restaurant-coupons';
@@ -762,6 +764,23 @@ class AppRoutes {
           transitionDuration: const Duration(milliseconds: 300),
           pageBuilder: (_, animation, secondaryAnimation) =>
               RegistrationApprovedPage(data: data),
+          transitionsBuilder: (_, animation, secondaryAnimation, child) {
+            final offsetAnim = Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            );
+            return SlideTransition(position: offsetAnim, child: child);
+          },
+        );
+      case registrationRejected:
+        final data = settings.arguments as RestaurantRegistrationData?;
+        return PageRouteBuilder<void>(
+          settings: settings,
+          transitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (_, animation, secondaryAnimation) =>
+              RegistrationRejectedPage(data: data),
           transitionsBuilder: (_, animation, secondaryAnimation, child) {
             final offsetAnim = Tween<Offset>(
               begin: const Offset(1, 0),

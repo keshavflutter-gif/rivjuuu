@@ -18,19 +18,6 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
   late final TextEditingController _restaurantNameController;
   late final TextEditingController _addressController;
 
-  final List<String> _categories = const [
-    'Italian',
-    'Asian',
-    'Burgers',
-    'Café',
-    'Indian',
-    'Pizza',
-    'Mexican',
-    'Bakery & Dessert',
-    'Healthy & Salads',
-    'Barbecue & Grill',
-  ];
-
   @override
   bool get wantKeepAlive => true;
 
@@ -41,6 +28,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
     _restaurantNameController =
         TextEditingController(text: bloc.state.restaurantName);
     _addressController = TextEditingController(text: bloc.state.restaurantAddress);
+    bloc.add(const FetchCategoriesRequested());
   }
 
   @override
@@ -52,6 +40,9 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
 
   void _showCategoryPicker(BuildContext context) {
     final bloc = context.read<RestaurantSignupBloc>();
+    if (bloc.state.categories.isEmpty) {
+      bloc.add(const FetchCategoriesRequested());
+    }
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -59,56 +50,124 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    'Select category',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.navy,
+        return BlocBuilder<RestaurantSignupBloc, RestaurantSignupState>(
+          bloc: bloc,
+          builder: (context, state) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        'Select category',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.navy,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Flexible(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _categories.length,
-                    itemBuilder: (context, index) {
-                      final cat = _categories[index];
-                      final isSelected = bloc.state.restaurantCategory == cat;
-                      return ListTile(
-                        title: Text(
-                          cat,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected
-                                ? AppColors.coral
-                                : AppColors.navy,
+                    if (state.isLoadingCategories)
+                      const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.coral,
                           ),
                         ),
-                        trailing: isSelected
-                            ? const Icon(Icons.check, color: AppColors.coral)
-                            : null,
-                        onTap: () {
-                          bloc.add(RestaurantCategoryChanged(cat));
-                          Navigator.of(ctx).pop();
-                        },
-                      );
-                    },
-                  ),
+                      )
+                    else if (state.categories.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 20,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Failed to load categories.',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: AppColors.text,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () =>
+                                  bloc.add(const FetchCategoriesRequested()),
+                              child: Text(
+                                'Retry',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.coral,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.categories.length,
+                          itemBuilder: (context, index) {
+                            final catModel = state.categories[index];
+                            final catName = catModel.name;
+                            final catId = catModel.id;
+
+                            final isSelected = (state.categoryId.isNotEmpty &&
+                                    catId.isNotEmpty &&
+                                    state.categoryId == catId) ||
+                                (state.restaurantCategory.toLowerCase() ==
+                                    catName.toLowerCase());
+
+                            return ListTile(
+                              title: Text(
+                                catName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? AppColors.coral
+                                      : AppColors.navy,
+                                ),
+                              ),
+                              subtitle: catModel.description != null &&
+                                      catModel.description!.isNotEmpty
+                                  ? Text(
+                                      catModel.description!,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: AppColors.muted,
+                                      ),
+                                    )
+                                  : null,
+                              trailing: isSelected
+                                  ? const Icon(Icons.check,
+                                      color: AppColors.coral)
+                                  : null,
+                              onTap: () {
+                                bloc.add(RestaurantCategoryChanged(catName,
+                                    categoryId: catId));
+                                Navigator.of(ctx).pop();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -128,9 +187,16 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Location pinned: $label'),
-        duration: const Duration(seconds: 1),
-        backgroundColor: AppColors.navy,
+        duration: const Duration(seconds: 2),
+        content: Text(
+          'Location pinned: $label',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF1F7A45),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }

@@ -128,8 +128,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         final user = response.user;
         final role = (response.role ?? user?.role ?? '').toUpperCase();
 
-        // Check if role is CUSTOMER
-        if (role != 'CUSTOMER') {
+        // Check if role is CUSTOMER or RESTAURANT
+        if (role != 'CUSTOMER' && role != 'RESTAURANT') {
           emit(LoginFailure(
             message: AppMessages.unsupportedRole,
             email: email,

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
@@ -14,7 +13,7 @@ class RegistrationPendingPage extends StatefulWidget {
   const RegistrationPendingPage({
     super.key,
     this.data,
-    this.autoAdvance = true,
+    this.autoAdvance = false,
     this.autoAdvanceDuration = const Duration(milliseconds: 2500),
   });
 
@@ -23,35 +22,6 @@ class RegistrationPendingPage extends StatefulWidget {
 }
 
 class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
-  Timer? _autoTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.autoAdvance) {
-      _autoTimer = Timer(widget.autoAdvanceDuration, () {
-        if (mounted) {
-          _navigateToApproved();
-        }
-      });
-    }
-  }
-
-  void _navigateToApproved() {
-    _autoTimer?.cancel();
-    _autoTimer = null;
-    Navigator.of(context).pushReplacementNamed(
-      AppRoutes.registrationApproved,
-      arguments: widget.data,
-    );
-  }
-
-  @override
-  void dispose() {
-    _autoTimer?.cancel();
-    super.dispose();
-  }
-
   String _formatInitials(String name) {
     if (name.trim().isEmpty) return 'NR';
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -65,7 +35,6 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
   }
 
   void _showSubmittedDetails(BuildContext context, RestaurantRegistrationData d) {
-    _autoTimer?.cancel();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -209,7 +178,6 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                   ),
                   InkWell(
                     onTap: () {
-                      _autoTimer?.cancel();
                       Navigator.of(context).pushNamedAndRemoveUntil(
                         AppRoutes.login,
                         (route) => false,
@@ -295,115 +263,112 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
               const SizedBox(height: 28),
 
               // Summary card
-              GestureDetector(
-                onTap: _navigateToApproved,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.line),
-                  ),
-                  child: Column(
-                    children: [
-                      // Header row: Logo + Name + Category/Address
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2E4A3A),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: Text(
-                                initials,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.line),
+                ),
+                child: Column(
+                  children: [
+                    // Header row: Logo + Name + Category/Address
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E4A3A),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  restaurantName,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.navy,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '$category · $address',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    color: AppColors.text,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 14),
-                      const Divider(height: 1, color: AppColors.line),
-                      const SizedBox(height: 12),
-
-                      // Email row
-                      _buildSummaryRow('Email', email),
-                      const SizedBox(height: 8),
-
-                      // Submitted date row
-                      _buildSummaryRow('Submitted', '29 Sep 2026'),
-                      const SizedBox(height: 8),
-
-                      // Status row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Status',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12.5,
-                              color: AppColors.text,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.amberSoft,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
+                          child: Center(
                             child: Text(
-                              'Pending review',
+                              initials,
                               style: GoogleFonts.poppins(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF8A5300),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                restaurantName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.navy,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '$category · $address',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: AppColors.text,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 14),
+                    const Divider(height: 1, color: AppColors.line),
+                    const SizedBox(height: 12),
+
+                    // Email row
+                    _buildSummaryRow('Email', email),
+                    const SizedBox(height: 8),
+
+                    // Submitted date row
+                    _buildSummaryRow('Submitted', '29 Sep 2026'),
+                    const SizedBox(height: 8),
+
+                    // Status row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Status',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12.5,
+                            color: AppColors.text,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 3.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.amberSoft,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            'Pending review',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF8A5300),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
 
@@ -436,9 +401,17 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                 child: GestureDetector(
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Support email: support@rivjuuu.com'),
-                        backgroundColor: AppColors.navy,
+                      SnackBar(
+                        duration: const Duration(seconds: 2),
+                        content: Text(
+                          'Support email: support@rivjuuu.com',
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        ),
+                        backgroundColor: const Color(0xFF1F7A45),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     );
                   },
