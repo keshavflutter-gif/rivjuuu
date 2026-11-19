@@ -88,6 +88,27 @@ class _SplashViewState extends State<SplashView>
         if (state.status == SplashStatus.authenticated) {
           // Persistent login: session exists, navigate directly to customer home
           Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        } else if (state.status == SplashStatus.authenticatedRestaurant) {
+          // Persistent login: restaurant is approved, navigate directly to dashboard
+          Navigator.of(context).pushReplacementNamed(
+            AppRoutes.restaurantDashboard,
+            arguments: state.restaurantData,
+          );
+        } else if (state.status == SplashStatus.authenticatedRestaurantPending) {
+          // Persistent login: restaurant is pending approval, navigate to pending screen
+          Navigator.of(context).pushReplacementNamed(
+            AppRoutes.registrationPending,
+            arguments: state.restaurantData,
+          );
+        } else if (state.status == SplashStatus.authenticatedRestaurantRejected) {
+          // Persistent login: restaurant rejected, navigate to rejected screen
+          Navigator.of(context).pushReplacementNamed(
+            AppRoutes.registrationRejected,
+            arguments: state.restaurantData,
+          );
+        } else if (state.status == SplashStatus.unauthenticatedWithLanguage) {
+          // Language already chosen: navigate directly to login
+          Navigator.of(context).pushReplacementNamed(AppRoutes.login);
         } else if (state.status == SplashStatus.unauthenticated ||
             state.status == SplashStatus.completed) {
           // No session: navigate to language / onboarding flow

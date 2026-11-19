@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/widgets/restaurant_bottom_nav_bar.dart';
 import '../../restaurant_dashboard/view/restaurant_dashboard_page.dart';
@@ -55,7 +56,7 @@ class _RestaurantCouponsContentViewState extends State<RestaurantCouponsContentV
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Coupons',
+                    context.l10n.navCoupons,
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       height: 1.36,
@@ -71,7 +72,7 @@ class _RestaurantCouponsContentViewState extends State<RestaurantCouponsContentV
                       },
                       icon: const Icon(Icons.add_rounded, size: 16),
                       label: Text(
-                        'Create coupon',
+                        context.l10n.createCoupon,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -103,11 +104,11 @@ class _RestaurantCouponsContentViewState extends State<RestaurantCouponsContentV
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    _buildTab(0, 'Active · 4'),
+                    _buildTab(0, context.l10n.activeCouponsTab),
                     const SizedBox(width: 22),
-                    _buildTab(1, 'Scheduled · 1'),
+                    _buildTab(1, context.l10n.scheduledCouponsTab),
                     const SizedBox(width: 22),
-                    _buildTab(2, 'Expired / inactive'),
+                    _buildTab(2, context.l10n.expiredCouponsTab),
                   ],
                 ),
               ),

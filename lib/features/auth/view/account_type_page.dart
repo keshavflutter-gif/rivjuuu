@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 
 class AccountTypePage extends StatelessWidget {
@@ -28,7 +29,7 @@ class AccountTypePage extends StatelessWidget {
             children: [
               const SizedBox(height: 8),
               Text(
-                'Create your account',
+                context.l10n.createYourAccount,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -38,7 +39,7 @@ class AccountTypePage extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'How would you like to use Rivjuuu?',
+                context.l10n.howWouldYouLikeToUse,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: AppColors.text,
@@ -51,9 +52,8 @@ class AccountTypePage extends StatelessWidget {
                 backgroundColor: AppColors.coralSoft,
                 imagePath: AppAssets.customer,
                 icon: Icons.person_outline,
-                title: 'Customer',
-                description:
-                    'Discover restaurants, redeem coupons and collect rewards.',
+                title: context.l10n.customerRole,
+                description: context.l10n.customerRoleDescription,
                 onTap: () {
                   Navigator.of(context).pushNamed(AppRoutes.customerSignUp);
                 },
@@ -66,9 +66,8 @@ class AccountTypePage extends StatelessWidget {
                 backgroundColor: AppColors.peach,
                 imagePath: AppAssets.restaurant,
                 icon: Icons.storefront_outlined,
-                title: 'Restaurant',
-                description:
-                    'Manage your restaurant, offers and customer rewards.',
+                title: context.l10n.restaurantRole,
+                description: context.l10n.restaurantRoleDescription,
                 onTap: () {
                   Navigator.of(context).pushNamed(AppRoutes.restaurantSignUpStep1);
                 },

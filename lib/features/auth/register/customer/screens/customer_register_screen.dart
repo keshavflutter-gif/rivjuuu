@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../../core/constants/app_colors.dart';
+import '../../../../../../core/extensions/localization_extension.dart';
 import '../../../../../../core/routes/app_router.dart';
+import '../../../../../../core/utils/localized_messages.dart';
 import '../../../../../../core/utils/validators.dart';
 import '../../../../../../data/models/auth/customer_register_request.dart';
 import '../bloc/customer_register_bloc.dart';
@@ -205,7 +207,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                   SnackBar(
                     duration: const Duration(seconds: 2),
                     content: Text(
-                      state.message,
+                      LocalizedMessages.get(context, state.message),
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                     backgroundColor: const Color(0xFFE03131),
@@ -243,7 +245,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                   SnackBar(
                     duration: const Duration(seconds: 2),
                     content: Text(
-                      state.message,
+                      LocalizedMessages.get(context, state.message),
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                     backgroundColor: const Color(0xFF1F7A45),
@@ -300,7 +302,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
 
                     // Title
                     Text(
-                      'Create account',
+                      context.l10n.createAccount,
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
@@ -313,7 +315,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
 
                     // Subtitle
                     Text(
-                      'Join Rivjuuu and start exploring great restaurants.',
+                      context.l10n.createAccountSubtitle,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -326,10 +328,12 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
 
                     // Full Name
                     _buildField(
-                      label: 'Full name',
-                      hint: 'John Doe',
+                      label: context.l10n.fullNameLabel,
+                      hint: context.l10n.fullNameHint,
                       controller: _nameController,
-                      errorText: _nameError,
+                      errorText: _nameError != null
+                          ? LocalizedMessages.get(context, _nameError)
+                          : null,
                       onChanged: (val) {
                         if (_nameError != null) {
                           setState(() {
@@ -343,10 +347,12 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
 
                     // Email address
                     _buildField(
-                      label: 'Email address',
-                      hint: 'you@example.com',
+                      label: context.l10n.emailLabel,
+                      hint: context.l10n.emailHint,
                       controller: _emailController,
-                      errorText: _emailError,
+                      errorText: _emailError != null
+                          ? LocalizedMessages.get(context, _emailError)
+                          : null,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: (val) {
                         if (_emailError != null) {
@@ -361,10 +367,12 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
 
                     // Password
                     _buildField(
-                      label: 'Password',
-                      hint: 'Create a password',
+                      label: context.l10n.passwordLabel,
+                      hint: context.l10n.createPasswordHint,
                       controller: _passwordController,
-                      errorText: _passwordError,
+                      errorText: _passwordError != null
+                          ? LocalizedMessages.get(context, _passwordError)
+                          : null,
                       isPassword: true,
                       obscureText: !_isPasswordVisible,
                       onToggleVisibility: () {
@@ -385,10 +393,12 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
 
                     // Confirm password
                     _buildField(
-                      label: 'Confirm password',
-                      hint: 'Confirm your password',
+                      label: context.l10n.confirmPasswordLabel,
+                      hint: context.l10n.confirmPasswordHint,
                       controller: _confirmPasswordController,
-                      errorText: _confirmPasswordError,
+                      errorText: _confirmPasswordError != null
+                          ? LocalizedMessages.get(context, _confirmPasswordError)
+                          : null,
                       isPassword: true,
                       obscureText: !_isConfirmPasswordVisible,
                       onToggleVisibility: () {
@@ -455,7 +465,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                           Expanded(
                             child: RichText(
                               text: TextSpan(
-                                text: 'I agree to the ',
+                                text: context.l10n.iAgreeToThe,
                                 style: GoogleFonts.poppins(
                                   fontSize: 12.5,
                                   color: AppColors.text,
@@ -463,7 +473,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: 'Terms and Conditions',
+                                    text: context.l10n.termsAndConditions,
                                     style: GoogleFonts.poppins(
                                       fontSize: 12.5,
                                       color: AppColors.coral,
@@ -476,9 +486,9 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                                             .pushNamed(AppRoutes.legal);
                                       },
                                   ),
-                                  const TextSpan(text: ' and '),
+                                  TextSpan(text: context.l10n.and),
                                   TextSpan(
-                                    text: 'Privacy Policy',
+                                    text: context.l10n.privacyPolicy,
                                     style: GoogleFonts.poppins(
                                       fontSize: 12.5,
                                       color: AppColors.coral,
@@ -504,7 +514,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 28),
                         child: Text(
-                          _termsError!,
+                          LocalizedMessages.get(context, _termsError),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: const Color(0xFFE03131),
@@ -560,7 +570,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                                 ),
                               )
                             : Text(
-                                'Create account',
+                                context.l10n.createAccount,
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -576,7 +586,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Already have an account? ',
+                          context.l10n.alreadyHaveAccount,
                           style: GoogleFonts.poppins(
                             fontSize: 13.5,
                             color: AppColors.navy,
@@ -589,7 +599,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
                                 .pushReplacementNamed(AppRoutes.login);
                           },
                           child: Text(
-                            'Log in',
+                            context.l10n.logIn,
                             style: GoogleFonts.poppins(
                               fontSize: 13.5,
                               color: AppColors.coral,

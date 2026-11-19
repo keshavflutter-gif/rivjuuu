@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../extensions/localization_extension.dart';
 
 class RestaurantBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -32,23 +33,23 @@ class RestaurantBottomNavBar extends StatelessWidget {
                   _buildNavItem(
                     index: 0,
                     iconBuilder: (color) => RestaurantDashboardIcon(size: 22, color: color),
-                    label: 'Dashboard',
+                    label: context.l10n.navDashboard,
                   ),
                   _buildNavItem(
                     index: 1,
                     iconBuilder: (color) => RestaurantTicketIcon(size: 22, color: color),
-                    label: 'Coupons',
+                    label: context.l10n.navCoupons,
                   ),
                   const Expanded(child: SizedBox()), // Center gap for raised scan
                   _buildNavItem(
                     index: 3,
                     iconBuilder: (color) => RestaurantActivityIcon(size: 22, color: color),
-                    label: 'Activity',
+                    label: context.l10n.navActivity,
                   ),
                   _buildNavItem(
                     index: 4,
                     iconBuilder: (color) => RestaurantUserIcon(size: 22, color: color),
-                    label: 'Profile',
+                    label: context.l10n.navProfile,
                   ),
                 ],
               ),
@@ -84,7 +85,7 @@ class RestaurantBottomNavBar extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Scan',
+                        context.l10n.navScan,
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           height: 1.27,
@@ -127,6 +128,8 @@ class RestaurantBottomNavBar extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
                 fontSize: 11,
                 height: 1.27,

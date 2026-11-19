@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/storage/token_storage_service.dart';
 import '../models/restaurant_registration_data.dart';
 
 class RegistrationApprovedPage extends StatelessWidget {
@@ -51,11 +53,15 @@ class RegistrationApprovedPage extends StatelessWidget {
                     fit: BoxFit.contain,
                   ),
                   InkWell(
-                    onTap: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.login,
-                        (route) => false,
-                      );
+                    onTap: () async {
+                      final storage = await TokenStorageService.getInstance();
+                      await storage.clearSession();
+                      if (context.mounted) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.login,
+                          (route) => false,
+                        );
+                      }
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
@@ -73,7 +79,7 @@ class RegistrationApprovedPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Log out',
+                            context.l10n.logOutButton,
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -124,7 +130,7 @@ class RegistrationApprovedPage extends StatelessWidget {
               const SizedBox(height: 24),
 
               Text(
-                'Your restaurant is approved',
+                context.l10n.yourRestaurantIsApprovedTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
@@ -137,7 +143,7 @@ class RegistrationApprovedPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Choose a plan to finish setup and start publishing coupons.',
+                  context.l10n.yourRestaurantIsApprovedSubtitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 13.5,
@@ -217,7 +223,7 @@ class RegistrationApprovedPage extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // Submitted date row
-                    _buildSummaryRow('Submitted', '29 Sep 2026'),
+                    _buildSummaryRow(context.l10n.submittedLabel, '29 Sep 2026'),
                     const SizedBox(height: 8),
 
                     // Status row with green badge
@@ -225,7 +231,7 @@ class RegistrationApprovedPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Status',
+                          context.l10n.statusLabel,
                           style: GoogleFonts.poppins(
                             fontSize: 12.5,
                             color: AppColors.text,
@@ -253,7 +259,7 @@ class RegistrationApprovedPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'Approved',
+                                context.l10n.approvedStatus,
                                 style: GoogleFonts.poppins(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
@@ -290,7 +296,7 @@ class RegistrationApprovedPage extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Continue',
+                    context.l10n.continueButton,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
+import '../../../core/utils/localized_messages.dart';
+import '../../../data/models/restaurant/restaurant_category_model.dart';
 import '../bloc/restaurant_signup_bloc.dart';
 import '../bloc/restaurant_signup_event.dart';
 import '../bloc/restaurant_signup_state.dart';
@@ -62,7 +65,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
-                        'Select category',
+                        ctx.l10n.selectCategoryHint,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -120,16 +123,26 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                             final catModel = state.categories[index];
                             final catName = catModel.name;
                             final catId = catModel.id;
+                            final currentLocale =
+                                Localizations.maybeLocaleOf(ctx)?.languageCode ??
+                                    Localizations.maybeLocaleOf(context)?.languageCode ??
+                                    'en';
+                            final localizedCatName =
+                                catModel.localizedName(currentLocale);
+                            final localizedCatDesc =
+                                catModel.localizedDescription(currentLocale);
 
                             final isSelected = (state.categoryId.isNotEmpty &&
                                     catId.isNotEmpty &&
                                     state.categoryId == catId) ||
                                 (state.restaurantCategory.toLowerCase() ==
-                                    catName.toLowerCase());
+                                    catName.toLowerCase()) ||
+                                (state.restaurantCategory.toLowerCase() ==
+                                    localizedCatName.toLowerCase());
 
                             return ListTile(
                               title: Text(
-                                catName,
+                                localizedCatName,
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: isSelected
@@ -140,10 +153,10 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                                       : AppColors.navy,
                                 ),
                               ),
-                              subtitle: catModel.description != null &&
-                                      catModel.description!.isNotEmpty
+                              subtitle: localizedCatDesc != null &&
+                                      localizedCatDesc.isNotEmpty
                                   ? Text(
-                                      catModel.description!,
+                                      localizedCatDesc,
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: AppColors.muted,
@@ -189,7 +202,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
       SnackBar(
         duration: const Duration(seconds: 2),
         content: Text(
-          'Location pinned: $label',
+          LocalizedMessages.get(context, 'Location pinned: $label'),
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF1F7A45),
@@ -227,7 +240,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
             const SizedBox(height: 8),
 
             Text(
-              'Restaurant information',
+              context.l10n.step2Title,
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -238,7 +251,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
             const SizedBox(height: 6),
 
             Text(
-              'Tell us about your restaurant.',
+              context.l10n.step2Subtitle,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: AppColors.text,
@@ -252,11 +265,12 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                   prev.validationErrors['restaurantName'] !=
                   curr.validationErrors['restaurantName'],
               builder: (context, state) {
+                final err = state.validationErrors['restaurantName'];
                 return _buildField(
-                  label: 'Restaurant name',
-                  hint: 'Your restaurant name',
+                  label: context.l10n.restaurantNameLabel,
+                  hint: context.l10n.restaurantNameHint,
                   controller: _restaurantNameController,
-                  errorText: state.validationErrors['restaurantName'],
+                  errorText: err != null ? LocalizedMessages.get(context, err) : null,
                   onChanged: (val) => bloc.add(RestaurantNameChanged(val)),
                 );
               },
@@ -272,12 +286,30 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
               builder: (context, state) {
                 final hasSelected = state.restaurantCategory.isNotEmpty;
                 final errorText = state.validationErrors['restaurantCategory'];
+                final currentLocale =
+                    Localizations.maybeLocaleOf(context)?.languageCode ?? 'en';
+                final selectedCat = state.categories.firstWhere(
+                  (c) =>
+                      (state.categoryId.isNotEmpty &&
+                          c.id == state.categoryId) ||
+                      c.name.toLowerCase() ==
+                          state.restaurantCategory.toLowerCase() ||
+                      c.localizedName(currentLocale).toLowerCase() ==
+                          state.restaurantCategory.toLowerCase(),
+                  orElse: () => RestaurantCategoryModel(
+                    id: state.categoryId,
+                    name: state.restaurantCategory,
+                  ),
+                );
+                final displayCategoryName = hasSelected
+                    ? selectedCat.localizedName(currentLocale)
+                    : context.l10n.selectCategoryHint;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Restaurant category',
+                      context.l10n.restaurantCategoryLabel,
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -303,9 +335,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                           children: [
                             Expanded(
                               child: Text(
-                                hasSelected
-                                    ? state.restaurantCategory
-                                    : 'Select category',
+                                displayCategoryName,
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   color: hasSelected
@@ -331,7 +361,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                       Padding(
                         padding: const EdgeInsets.only(left: 4.0),
                         child: Text(
-                          errorText,
+                          LocalizedMessages.get(context, errorText),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: AppColors.coral,
@@ -351,11 +381,12 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                   prev.validationErrors['restaurantAddress'] !=
                   curr.validationErrors['restaurantAddress'],
               builder: (context, state) {
+                final err = state.validationErrors['restaurantAddress'];
                 return _buildField(
-                  label: 'Address',
-                  hint: 'Enter address',
+                  label: context.l10n.addressLabel,
+                  hint: context.l10n.addressHint,
                   controller: _addressController,
-                  errorText: state.validationErrors['restaurantAddress'],
+                  errorText: err != null ? LocalizedMessages.get(context, err) : null,
                   onChanged: (val) => bloc.add(RestaurantAddressChanged(val)),
                 );
               },
@@ -376,14 +407,14 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                     (state.latitude != null && state.longitude != null);
                 final locationText = state.locationLabel?.isNotEmpty == true
                     ? state.locationLabel!
-                    : 'Set location on map';
+                    : context.l10n.setLocationOnMap;
                 final errorText = state.validationErrors['restaurantLocation'];
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Restaurant location',
+                      context.l10n.restaurantLocationLabel,
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -456,7 +487,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                       Padding(
                         padding: const EdgeInsets.only(left: 4.0),
                         child: Text(
-                          errorText,
+                          LocalizedMessages.get(context, errorText),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: AppColors.coral,
@@ -495,7 +526,7 @@ class _RestaurantStep2ViewState extends State<RestaurantStep2View>
                 ),
                 onPressed: () => bloc.add(const NextStepRequested()),
                 child: Text(
-                  'Continue',
+                  context.l10n.continueButton,
                   style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

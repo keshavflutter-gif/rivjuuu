@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 
 class RestaurantActivityItemData {
   final String initials;
@@ -118,7 +119,7 @@ class _RestaurantActivityContentViewState
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
           child: Text(
-            'Activity',
+            context.l10n.navActivity,
             style: GoogleFonts.poppins(
               fontSize: 22,
               height: 1.36,
@@ -141,21 +142,21 @@ class _RestaurantActivityContentViewState
                   children: [
                     Expanded(
                       child: _buildStatCard(
-                        label: 'Earned',
+                        label: context.l10n.earned,
                         value: '12,480',
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: _buildStatCard(
-                        label: 'Redeemed',
+                        label: context.l10n.redeemed,
                         value: '4,350',
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: _buildStatCard(
-                        label: 'Rewards',
+                        label: context.l10n.rewards,
                         value: '29',
                       ),
                     ),
@@ -167,11 +168,11 @@ class _RestaurantActivityContentViewState
                 // Filter Chips (.chip2)
                 Row(
                   children: [
-                    _buildFilterChip('All', 0),
+                    _buildFilterChip(context.l10n.all, 0),
                     const SizedBox(width: 8),
-                    _buildFilterChip('Earned', 1),
+                    _buildFilterChip(context.l10n.earned, 1),
                     const SizedBox(width: 8),
-                    _buildFilterChip('Redeemed', 2),
+                    _buildFilterChip(context.l10n.redeemed, 2),
                   ],
                 ),
 

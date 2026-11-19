@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rivjuuu/core/constants/app_colors.dart';
+import 'package:rivjuuu/core/utils/localized_messages.dart';
 import 'package:rivjuuu/features/profile/bloc/profile_bloc.dart';
 import 'package:rivjuuu/features/profile/bloc/profile_event.dart';
 import 'package:rivjuuu/features/profile/bloc/profile_state.dart';
@@ -44,7 +45,7 @@ class _EditProfileViewState extends State<EditProfileView> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Profile updated',
+                LocalizedMessages.get(context, 'Profile updated'),
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,

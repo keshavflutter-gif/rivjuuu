@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_messages.dart';
-import '../../../core/constants/app_strings.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/utils/localized_messages.dart';
 import '../../../core/utils/validators.dart';
 import '../../restaurant_registration/models/restaurant_registration_data.dart';
 import '../bloc/login_bloc.dart';
@@ -78,7 +78,7 @@ class _LoginViewState extends State<LoginView> {
               SnackBar(
                 duration: const Duration(seconds: 2),
                 content: Text(
-                  state.message,
+                  LocalizedMessages.get(context, state.message),
                   style: GoogleFonts.poppins(color: Colors.white),
                 ),
                 backgroundColor: const Color(0xFFE03131),
@@ -105,13 +105,14 @@ class _LoginViewState extends State<LoginView> {
                 (response.role ?? response.user?.role ?? '').toUpperCase();
 
             void showSuccessSnackBar() {
+              final msg = state.response.message.isNotEmpty
+                  ? LocalizedMessages.get(context, state.response.message)
+                  : context.l10n.loginSuccess;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   duration: const Duration(seconds: 2),
                   content: Text(
-                    state.response.message.isNotEmpty
-                        ? state.response.message
-                        : AppMessages.loginSuccess,
+                    msg,
                     style: GoogleFonts.poppins(color: Colors.white),
                   ),
                   backgroundColor: const Color(0xFF1F7A45),
@@ -136,9 +137,9 @@ class _LoginViewState extends State<LoginView> {
                   restaurants.first is Map) {
                 final rest = restaurants.first as Map<String, dynamic>;
                 approvalStatus =
-                    (rest['approvalStatus'] as String? ?? 'PENDING')
+                    (rest['approvalStatus'] as String? ?? rest['status'] as String? ?? 'PENDING')
                         .toUpperCase();
-                restaurantName = rest['name'] as String? ?? restaurantName;
+                restaurantName = rest['name'] as String? ?? rest['restaurantName'] as String? ?? restaurantName;
                 restaurantCategory =
                     rest['category'] as String? ?? restaurantCategory;
                 restaurantAddress =
@@ -158,7 +159,7 @@ class _LoginViewState extends State<LoginView> {
                 approvalStatus: approvalStatus,
               );
 
-              if (approvalStatus == 'APPROVED') {
+              if (approvalStatus == 'APPROVED' || approvalStatus == 'ACTIVE') {
                 showSuccessSnackBar();
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   AppRoutes.restaurantDashboard,
@@ -280,7 +281,7 @@ class _LoginViewState extends State<LoginView> {
 
                       // Heading: Welcome to Rivjuuu
                       Text(
-                        AppStrings.welcomeTitle,
+                        context.l10n.welcomeTitle,
                         style: GoogleFonts.poppins(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -294,7 +295,7 @@ class _LoginViewState extends State<LoginView> {
 
                       // Subtitle
                       Text(
-                        AppStrings.welcomeSubtitle,
+                        context.l10n.welcomeSubtitle,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
@@ -307,7 +308,7 @@ class _LoginViewState extends State<LoginView> {
 
                       // Field 1: Email address
                       Text(
-                        AppStrings.emailLabel,
+                        context.l10n.emailLabel,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -337,7 +338,7 @@ class _LoginViewState extends State<LoginView> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: AppStrings.emailHint,
+                          hintText: context.l10n.emailHint,
                           hintStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             color: const Color(0xFFA1A1AA),
@@ -372,7 +373,7 @@ class _LoginViewState extends State<LoginView> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4),
                           child: Text(
-                            _emailError!,
+                            LocalizedMessages.get(context, _emailError),
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: const Color(0xFFE03131),
@@ -386,7 +387,7 @@ class _LoginViewState extends State<LoginView> {
 
                       // Field 2: Password
                       Text(
-                        AppStrings.passwordLabel,
+                        context.l10n.passwordLabel,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -421,7 +422,7 @@ class _LoginViewState extends State<LoginView> {
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
-                              hintText: AppStrings.passwordHint,
+                              hintText: context.l10n.passwordHint,
                               hintStyle: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: const Color(0xFFA1A1AA),
@@ -472,7 +473,7 @@ class _LoginViewState extends State<LoginView> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4),
                           child: Text(
-                            _passwordError!,
+                            LocalizedMessages.get(context, _passwordError),
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: const Color(0xFFE03131),
@@ -493,7 +494,7 @@ class _LoginViewState extends State<LoginView> {
                                 .pushNamed(AppRoutes.forgotPassword);
                           },
                           child: Text(
-                            AppStrings.forgotPassword,
+                            context.l10n.forgotPassword,
                             style: GoogleFonts.poppins(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w500,
@@ -552,7 +553,7 @@ class _LoginViewState extends State<LoginView> {
                                       ),
                                     )
                                   : Text(
-                                      AppStrings.logIn,
+                                      context.l10n.logIn,
                                       style: GoogleFonts.poppins(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
@@ -578,7 +579,7 @@ class _LoginViewState extends State<LoginView> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12.0),
                             child: Text(
-                              AppStrings.or,
+                              context.l10n.or,
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: AppColors.text,
@@ -603,7 +604,7 @@ class _LoginViewState extends State<LoginView> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
-                            AppStrings.newToRivjuuu,
+                            context.l10n.newToRivjuuu,
                             style: GoogleFonts.poppins(
                               fontSize: 13.5,
                               color: AppColors.navy,
@@ -616,7 +617,7 @@ class _LoginViewState extends State<LoginView> {
                                   .pushNamed(AppRoutes.accountType);
                             },
                             child: Text(
-                              AppStrings.createAccount,
+                              context.l10n.createAccount,
                               style: GoogleFonts.poppins(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w600,

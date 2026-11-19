@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rivjuuu/core/constants/app_colors.dart';
+import 'package:rivjuuu/core/extensions/localization_extension.dart';
 import 'package:rivjuuu/core/routes/app_router.dart';
+import 'package:rivjuuu/core/utils/localized_messages.dart';
 import 'package:rivjuuu/features/auth/logout/bloc/logout_bloc.dart';
 import 'package:rivjuuu/features/auth/logout/bloc/logout_event.dart';
 import 'package:rivjuuu/features/auth/logout/bloc/logout_state.dart';
+import 'package:rivjuuu/features/language/bloc/language_bloc.dart';
+import 'package:rivjuuu/features/language/bloc/language_event.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -27,9 +31,6 @@ class _SettingsViewState extends State<SettingsView> {
   bool _rewardNotifications = true;
   bool _socialNotifications = false;
 
-  // Language
-  String _currentLanguage = 'English';
-
   @override
   void initState() {
     super.initState();
@@ -44,6 +45,14 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    String currentLangCode = 'en';
+    try {
+      currentLangCode = context.watch<LanguageBloc>().state.selectedLanguage;
+    } catch (_) {}
+    final currentLangDisplay =
+        currentLangCode == 'hu' ? l10n.languageHungarian : l10n.languageEnglish;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -76,7 +85,7 @@ class _SettingsViewState extends State<SettingsView> {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
-                      'Settings',
+                      l10n.settingsItem,
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -99,11 +108,11 @@ class _SettingsViewState extends State<SettingsView> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Group 1: Account
-                    _buildSectionHeader('Account'),
+                    _buildSectionHeader(l10n.accountSection),
                     _buildCardGroup([
                       _buildRow(
                         icon: Icons.lock_outline_rounded,
-                        label: 'Change password',
+                        label: l10n.changePassword,
                         onTap: () {
                           Navigator.of(context).pushNamed(AppRoutes.newPassword);
                         },
@@ -111,24 +120,23 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildRow(
                         icon: Icons.language_rounded,
-                        label: 'Language',
-                        value: _currentLanguage,
+                        label: l10n.language,
+                        value: currentLangDisplay,
                         onTap: _showLanguageSelector,
                       ),
                     ]),
                     const SizedBox(height: 20),
 
                     // Group 2: Privacy
-                    _buildSectionHeader('Privacy'),
+                    _buildSectionHeader(l10n.privacySection),
                     _buildCardGroup([
                       _buildRow(
                         icon: Icons.person_outline_rounded,
-                        label: 'Profile & activity',
+                        label: l10n.profileAndActivity,
                         value: _profileVisibility,
                         onTap: () => _showVisibilitySheet(
-                          title: 'Profile & activity',
-                          description:
-                              'Choose who can see your profile, visits and activity.',
+                          title: l10n.profileAndActivity,
+                          description: l10n.profileAndActivityDesc,
                           currentValue: _profileVisibility,
                           onSelected: (val) {
                             setState(() => _profileVisibility = val);
@@ -138,12 +146,11 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildRow(
                         icon: Icons.location_on_outlined,
-                        label: 'Latest visit',
+                        label: l10n.latestVisit,
                         value: _visitVisibility,
                         onTap: () => _showVisibilitySheet(
-                          title: 'Latest visit',
-                          description:
-                              'Choose who can see the restaurant you visited last.',
+                          title: l10n.latestVisit,
+                          description: l10n.latestVisitDesc,
                           currentValue: _visitVisibility,
                           onSelected: (val) {
                             setState(() => _visitVisibility = val);
@@ -153,12 +160,11 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildRow(
                         icon: Icons.edit_outlined,
-                        label: 'Reviews',
+                        label: l10n.reviews,
                         value: _reviewsVisibility,
                         onTap: () => _showVisibilitySheet(
-                          title: 'Reviews',
-                          description:
-                              'Choose who can read your restaurant reviews.',
+                          title: l10n.reviews,
+                          description: l10n.reviewsDesc,
                           currentValue: _reviewsVisibility,
                           onSelected: (val) {
                             setState(() => _reviewsVisibility = val);
@@ -169,11 +175,11 @@ class _SettingsViewState extends State<SettingsView> {
                     const SizedBox(height: 20),
 
                     // Group 3: Notifications
-                    _buildSectionHeader('Notifications'),
+                    _buildSectionHeader(l10n.notificationsSection),
                     _buildCardGroup([
                       _buildSwitchRow(
                         icon: Icons.confirmation_number_outlined,
-                        label: 'Coupons & offers',
+                        label: l10n.couponsAndOffers,
                         value: _couponNotifications,
                         onChanged: (val) {
                           setState(() => _couponNotifications = val);
@@ -182,7 +188,7 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildSwitchRow(
                         icon: Icons.card_membership_rounded,
-                        label: 'Rewards & giveaways',
+                        label: l10n.rewardsAndGiveaways,
                         value: _rewardNotifications,
                         onChanged: (val) {
                           setState(() => _rewardNotifications = val);
@@ -191,7 +197,7 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildSwitchRow(
                         icon: Icons.people_outline_rounded,
-                        label: 'Friends & reviews',
+                        label: l10n.friendsAndReviews,
                         value: _socialNotifications,
                         onChanged: (val) {
                           setState(() => _socialNotifications = val);
@@ -201,15 +207,17 @@ class _SettingsViewState extends State<SettingsView> {
                     const SizedBox(height: 20),
 
                     // Group 4: Support & legal
-                    _buildSectionHeader('Support & legal'),
+                    _buildSectionHeader(l10n.supportAndLegal),
                     _buildCardGroup([
                       _buildRow(
                         icon: Icons.help_outline_rounded,
-                        label: 'Help & contact support',
+                        label: l10n.helpAndContactSupport,
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Support email: support@rivjuuu.com'),
+                            SnackBar(
+                              content: Text(
+                                LocalizedMessages.get(context, 'Support email: support@rivjuuu.com'),
+                              ),
                               duration: Duration(seconds: 2),
                               backgroundColor: AppColors.navy,
                             ),
@@ -219,7 +227,7 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildRow(
                         icon: Icons.description_outlined,
-                        label: 'Privacy Policy',
+                        label: l10n.privacyPolicy,
                         onTap: () {
                           Navigator.of(context).pushNamed(AppRoutes.legal);
                         },
@@ -227,7 +235,7 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildDivider(),
                       _buildRow(
                         icon: Icons.description_outlined,
-                        label: 'Terms and Conditions',
+                        label: l10n.termsAndConditions,
                         onTap: () {
                           Navigator.of(context).pushNamed(AppRoutes.legal);
                         },
@@ -257,7 +265,7 @@ class _SettingsViewState extends State<SettingsView> {
                           ),
                         ),
                         title: Text(
-                          'Log out',
+                          l10n.logOutButton,
                           style: GoogleFonts.poppins(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -453,8 +461,8 @@ class _SettingsViewState extends State<SettingsView> {
                     // Option: Private
                     _buildVisibilityOption(
                       icon: Icons.lock_outline_rounded,
-                      title: 'Private',
-                      subtitle: 'Only you',
+                      title: context.l10n.visibilityPrivate,
+                      subtitle: context.l10n.visibilityPrivateSub,
                       isSelected: tempSelected == 'Private',
                       onTap: () {
                         setSheetState(() => tempSelected = 'Private');
@@ -465,8 +473,8 @@ class _SettingsViewState extends State<SettingsView> {
                     // Option: Friends only
                     _buildVisibilityOption(
                       icon: Icons.people_outline_rounded,
-                      title: 'Friends only',
-                      subtitle: 'People you’ve accepted as friends',
+                      title: context.l10n.visibilityFriends,
+                      subtitle: context.l10n.visibilityFriendsSub,
                       isSelected: tempSelected == 'Friends only',
                       onTap: () {
                         setSheetState(() => tempSelected = 'Friends only');
@@ -477,8 +485,8 @@ class _SettingsViewState extends State<SettingsView> {
                     // Option: Public
                     _buildVisibilityOption(
                       icon: Icons.language_rounded,
-                      title: 'Public',
-                      subtitle: 'Anyone on Rivjuuu',
+                      title: context.l10n.visibilityPublic,
+                      subtitle: context.l10n.visibilityPublicSub,
                       isSelected: tempSelected == 'Public',
                       onTap: () {
                         setSheetState(() => tempSelected = 'Public');
@@ -503,7 +511,7 @@ class _SettingsViewState extends State<SettingsView> {
                           ),
                         ),
                         child: Text(
-                          'Done',
+                          context.l10n.done,
                           style: GoogleFonts.poppins(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -594,7 +602,15 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _showLanguageSelector() {
-    final languages = ['English', 'Magyar (Hungarian)', 'Deutsch (German)'];
+    String selectedCode = 'en';
+    try {
+      selectedCode = context.read<LanguageBloc>().state.selectedLanguage;
+    } catch (_) {}
+
+    final languageOptions = [
+      {'code': 'en', 'name': 'English'},
+      {'code': 'hu', 'name': 'Magyar (Hungarian)'},
+    ];
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -607,26 +623,26 @@ class _SettingsViewState extends State<SettingsView> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: languages.map((lang) {
+              children: languageOptions.map((opt) {
+                final name = opt['name']!;
+                final code = opt['code']!;
+                final isSelected = selectedCode == code;
                 return ListTile(
                   title: Text(
-                    lang,
+                    name,
                     style: GoogleFonts.poppins(
-                      fontWeight: _currentLanguage == lang
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      color: _currentLanguage == lang
-                          ? AppColors.coral
-                          : AppColors.navy,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected ? AppColors.coral : AppColors.navy,
                     ),
                   ),
-                  trailing: _currentLanguage == lang
+                  trailing: isSelected
                       ? const Icon(Icons.check, color: AppColors.coral)
                       : null,
                   onTap: () {
-                    setState(() {
-                      _currentLanguage = lang;
-                    });
+                    try {
+                      context.read<LanguageBloc>().add(LanguageSelected(code));
+                    } catch (_) {}
                     Navigator.of(ctx).pop();
                   },
                 );
@@ -662,7 +678,7 @@ class _SettingsViewState extends State<SettingsView> {
                   SnackBar(
                     duration: const Duration(seconds: 2),
                     content: Text(
-                      state.message,
+                      LocalizedMessages.get(parentContext, state.message),
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                     backgroundColor: const Color(0xFF1F7A45),
@@ -682,7 +698,7 @@ class _SettingsViewState extends State<SettingsView> {
                   SnackBar(
                     duration: const Duration(seconds: 2),
                     content: Text(
-                      state.message,
+                      LocalizedMessages.get(parentContext, state.message),
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                     backgroundColor: const Color(0xFFE03131),
@@ -710,14 +726,14 @@ class _SettingsViewState extends State<SettingsView> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 title: Text(
-                  'Log out',
+                  parentContext.l10n.logOutTitle,
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w700,
                     color: AppColors.navy,
                   ),
                 ),
                 content: Text(
-                  'Are you sure you want to log out of Rivjuuu?',
+                  parentContext.l10n.logOutConfirmation,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: AppColors.text,
@@ -728,7 +744,7 @@ class _SettingsViewState extends State<SettingsView> {
                     onPressed:
                         isLoading ? null : () => Navigator.of(dialogCtx).pop(),
                     child: Text(
-                      'Cancel',
+                      parentContext.l10n.cancel,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: isLoading ? AppColors.muted : AppColors.text,
@@ -760,7 +776,7 @@ class _SettingsViewState extends State<SettingsView> {
                             ),
                           )
                         : Text(
-                            'Log out',
+                            parentContext.l10n.logOutButton,
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600,
                             ),

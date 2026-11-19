@@ -10,6 +10,7 @@ import 'package:rivjuuu/features/auth/view/account_type_page.dart';
 import 'package:rivjuuu/features/auth/view/customer_signup_page.dart';
 import 'package:rivjuuu/features/auth/view/new_password_page.dart';
 import 'package:rivjuuu/features/permissions/view/notification_permission_page.dart';
+import 'package:rivjuuu/core/storage/language_storage_service.dart';
 import 'package:rivjuuu/core/storage/token_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,6 +37,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     TokenStorageService.resetForTesting();
+    LanguageStorageService.resetForTesting();
     LoginBloc.defaultRepository = _TestFakeLoginRepository();
   });
 

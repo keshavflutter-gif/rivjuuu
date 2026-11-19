@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rivjuuu/core/constants/app_colors.dart';
+import 'package:rivjuuu/core/extensions/localization_extension.dart';
 import 'package:rivjuuu/core/routes/app_router.dart';
 import 'package:rivjuuu/core/widgets/feather_award_icon.dart';
 import 'package:rivjuuu/features/home/widgets/home_bottom_nav_widget.dart';
@@ -34,6 +35,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -47,7 +49,7 @@ class _ProfileViewState extends State<ProfileView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Profile',
+                    l10n.profileTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -126,11 +128,11 @@ class _ProfileViewState extends State<ProfileView> {
 
                         // Group 1: My activity
                         ProfileMenuGroupWidget(
-                          title: 'My activity',
+                          title: l10n.myActivitySection,
                           items: [
                             ProfileMenuItem(
                               icon: Icons.confirmation_number_outlined,
-                              label: 'Coupon history',
+                              label: l10n.couponHistoryItem,
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed(AppRoutes.couponHistory);
@@ -138,7 +140,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             ProfileMenuItem(
                               iconWidget: const FeatherAwardIcon(size: 20),
-                              label: 'My rewards',
+                              label: l10n.myRewardsItem,
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed(AppRoutes.myRewards);
@@ -146,7 +148,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             ProfileMenuItem(
                               icon: Icons.card_giftcard_rounded,
-                              label: 'My giveaways',
+                              label: l10n.myGiveawaysItem,
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed(AppRoutes.myGiveaways);
@@ -154,7 +156,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             ProfileMenuItem(
                               icon: Icons.edit_outlined,
-                              label: 'My reviews',
+                              label: l10n.myReviewsItem,
                               value: '${profile.reviewCount}',
                               onTap: () {
                                 Navigator.of(context)
@@ -163,7 +165,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             ProfileMenuItem(
                               icon: Icons.favorite_border_rounded,
-                              label: 'Favorite restaurants',
+                              label: l10n.favoriteRestaurantsItem,
                               value: '${profile.favoriteRestaurantCount}',
                               onTap: () {
                                 Navigator.of(context)
@@ -172,7 +174,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             ProfileMenuItem(
                               icon: Icons.percent_rounded,
-                              label: 'Favorite coupons',
+                              label: l10n.favoriteCouponsItem,
                               value: '${profile.favoriteCouponCount}',
                               onTap: () {
                                 Navigator.of(context)
@@ -184,22 +186,22 @@ class _ProfileViewState extends State<ProfileView> {
 
                         // Group 2: Social
                         ProfileMenuGroupWidget(
-                          title: 'Social',
+                          title: l10n.socialSection,
                           items: [
                             ProfileMenuItem(
                               icon: Icons.people_outline_rounded,
-                              label: 'Friends',
+                              label: l10n.friendsItem,
                               value: '${profile.friendsCount}',
                               onTap: () {
                                 Navigator.of(context).pushNamed(
-                                  AppRoutes.friends,
-                                  arguments: 0,
+                                   AppRoutes.friends,
+                                   arguments: 0,
                                 );
                               },
                             ),
                             ProfileMenuItem(
                               icon: Icons.person_outline_rounded,
-                              label: 'Friend requests',
+                              label: l10n.friendRequestsItem,
                               value: '${profile.friendRequestsCount}',
                               isHighlightBadge: true,
                               onTap: () {
@@ -212,11 +214,11 @@ class _ProfileViewState extends State<ProfileView> {
 
                         // Group 3: Account
                         ProfileMenuGroupWidget(
-                          title: 'Account',
+                          title: l10n.accountSectionProfile,
                           items: [
                             ProfileMenuItem(
                               icon: Icons.notifications_none_rounded,
-                              label: 'Notifications',
+                              label: l10n.notificationsItem,
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed(AppRoutes.notifications);
@@ -224,7 +226,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             ProfileMenuItem(
                               icon: Icons.settings_outlined,
-                              label: 'Settings',
+                              label: l10n.settingsItem,
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed(AppRoutes.settings);

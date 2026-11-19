@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 import '../../restaurant_dashboard/view/restaurant_dashboard_page.dart';
 import '../../restaurant_registration/models/restaurant_registration_data.dart';
@@ -78,7 +79,7 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Profile',
+                    context.l10n.profileTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       height: 1.36,
@@ -222,7 +223,7 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
-                                            'Approved',
+                                            context.l10n.approvedStatus,
                                             style: GoogleFonts.poppins(
                                               fontSize: 10.5,
                                               fontWeight: FontWeight.w600,
@@ -233,11 +234,15 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                                       ),
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      '· Growth plan',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12.5,
-                                        color: AppColors.text,
+                                    Flexible(
+                                      child: Text(
+                                        '· ${context.l10n.growthPlan}',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12.5,
+                                          color: AppColors.text,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
@@ -254,11 +259,11 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
 
                     // Section: Restaurant
                     _buildSection(
-                      title: 'Restaurant',
+                      title: context.l10n.restaurantSection,
                       rows: [
                         _buildRowItem(
                           icon: LucideIcons.store,
-                          label: 'Restaurant profile',
+                          label: context.l10n.restaurantProfile,
                           value: '85%',
                           onTap: () {
                             HapticFeedback.lightImpact();
@@ -267,7 +272,7 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                         ),
                         _buildRowItem(
                           icon: LucideIcons.bookOpen,
-                          label: 'Menu',
+                          label: context.l10n.menu,
                           onTap: () {
                             Navigator.pushNamed(context, AppRoutes.restaurantMenuManage);
                           },
@@ -280,12 +285,12 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
 
                     // Section: Business
                     _buildSection(
-                      title: 'Business',
+                      title: context.l10n.businessSection,
                       rows: [
                         _buildRowItem(
                           icon: LucideIcons.creditCard,
-                          label: 'Subscription',
-                          value: 'Growth',
+                          label: context.l10n.subscription,
+                          value: context.l10n.growthPlanShort,
                           onTap: () {
                             Navigator.pushNamed(
                                 context, AppRoutes.restaurantSubscription);
@@ -293,7 +298,7 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                         ),
                         _buildRowItem(
                           icon: LucideIcons.barChart2,
-                          label: 'Statistics',
+                          label: context.l10n.statistics,
                           onTap: () {
                             Navigator.pushNamed(
                                 context, AppRoutes.restaurantStatistics);
@@ -307,11 +312,11 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
 
                     // Section: Engagement
                     _buildSection(
-                      title: 'Engagement',
+                      title: context.l10n.engagementSection,
                       rows: [
                         _buildRowItem(
                           icon: LucideIcons.award,
-                          label: 'Loyalty',
+                          label: context.l10n.loyalty,
                           onTap: () async {
                             final result = await Navigator.pushNamed(
                                 context, AppRoutes.restaurantLoyalty);
@@ -331,8 +336,8 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                         ),
                         _buildRowItem(
                           icon: LucideIcons.gift,
-                          label: 'Giveaways',
-                          value: '1 active',
+                          label: context.l10n.giveaways,
+                          value: context.l10n.oneActive,
                           onTap: () {
                             Navigator.pushNamed(
                                 context, AppRoutes.restaurantGiveaways);
@@ -346,11 +351,11 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
 
                     // Section: Account
                     _buildSection(
-                      title: 'Account',
+                      title: context.l10n.accountSection,
                       rows: [
                         _buildRowItem(
                           icon: LucideIcons.bell,
-                          label: 'Notifications',
+                          label: context.l10n.notificationsItem,
                           onTap: () {
                             Navigator.pushNamed(
                                 context, AppRoutes.restaurantNotifications);
@@ -358,7 +363,7 @@ class _RestaurantAccountContentViewState extends State<RestaurantAccountContentV
                         ),
                         _buildRowItem(
                           icon: LucideIcons.settings,
-                          label: 'Settings',
+                          label: context.l10n.settingsItem,
                           onTap: () {
                             Navigator.pushNamed(
                                 context, AppRoutes.restaurantSettings);

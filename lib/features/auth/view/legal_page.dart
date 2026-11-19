@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 
 class LegalPage extends StatelessWidget {
   const LegalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       appBar: AppBar(
@@ -27,7 +29,7 @@ class LegalPage extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                'Terms and Conditions',
+                l10n.termsAndConditions,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -39,7 +41,7 @@ class LegalPage extends StatelessWidget {
               const SizedBox(height: 4),
 
               Text(
-                'Last updated November 2026',
+                l10n.legalLastUpdated,
                 style: GoogleFonts.poppins(
                   fontSize: 12.5,
                   color: AppColors.text,
@@ -50,23 +52,20 @@ class LegalPage extends StatelessWidget {
 
               _buildSection(
                 number: '1.',
-                heading: 'Introduction',
-                content:
-                    'Welcome to Rivjuuu. By accessing or using our services, you agree to be bound by these terms and our Privacy Policy. If you do not agree, please do not use our app.',
+                heading: l10n.legalSection1Title,
+                content: l10n.legalSection1Content,
               ),
 
               _buildSection(
                 number: '2.',
-                heading: 'Account Responsibilities',
-                content:
-                    'You are responsible for maintaining the confidentiality of your account credentials and for all activities that take place under your account.',
+                heading: l10n.legalSection2Title,
+                content: l10n.legalSection2Content,
               ),
 
               _buildSection(
                 number: '3.',
-                heading: 'Rewards & Offers',
-                content:
-                    'Rewards, coupons, and offers provided by participating restaurants are subject to availability and specific restaurant terms.',
+                heading: l10n.legalSection3Title,
+                content: l10n.legalSection3Content,
               ),
 
               const SizedBox(height: 32),

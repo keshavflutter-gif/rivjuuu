@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/utils/localized_messages.dart';
+import '../../../data/models/restaurant/restaurant_category_model.dart';
 import '../bloc/restaurant_signup_bloc.dart';
 import '../bloc/restaurant_signup_event.dart';
 import '../bloc/restaurant_signup_state.dart';
@@ -23,8 +26,22 @@ class RestaurantStep4View extends StatelessWidget {
         final restaurantNameVal = state.restaurantName.isNotEmpty
             ? state.restaurantName
             : 'Trattoria Nonna Rosa';
-        final categoryVal =
-            state.restaurantCategory.isNotEmpty ? state.restaurantCategory : 'Italian';
+        final currentLocale =
+            Localizations.maybeLocaleOf(context)?.languageCode ?? 'en';
+        final selectedCat = state.categories.firstWhere(
+          (c) =>
+              (state.categoryId.isNotEmpty && c.id == state.categoryId) ||
+              c.name.toLowerCase() == state.restaurantCategory.toLowerCase() ||
+              c.localizedName(currentLocale).toLowerCase() ==
+                  state.restaurantCategory.toLowerCase(),
+          orElse: () => RestaurantCategoryModel(
+            id: state.categoryId,
+            name: state.restaurantCategory,
+          ),
+        );
+        final categoryVal = state.restaurantCategory.isNotEmpty
+            ? selectedCat.localizedName(currentLocale)
+            : (currentLocale == 'hu' ? 'Olasz' : 'Italian');
         final addressVal = state.restaurantAddress.isNotEmpty
             ? state.restaurantAddress
             : 'Fő utca 12, Hungary';
@@ -42,7 +59,7 @@ class RestaurantStep4View extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                'Review and submit',
+                context.l10n.step4Title,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -53,7 +70,7 @@ class RestaurantStep4View extends StatelessWidget {
               const SizedBox(height: 6),
 
               Text(
-                'Check your details before sending your application.',
+                context.l10n.step4Subtitle,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: AppColors.text,
@@ -63,39 +80,42 @@ class RestaurantStep4View extends StatelessWidget {
 
               // Summary Card 1: Account
               _buildSummaryCard(
-                title: 'Account',
+                title: context.l10n.accountSection,
+                editText: context.l10n.edit,
                 onEdit: () => bloc.add(const GoToStepRequested(0)),
                 rows: [
-                  _SummaryRow(label: 'Contact', value: contactVal),
-                  _SummaryRow(label: 'Email', value: emailVal),
+                  _SummaryRow(label: context.l10n.contactField, value: contactVal),
+                  _SummaryRow(label: context.l10n.emailField, value: emailVal),
                 ],
               ),
               const SizedBox(height: 12),
 
               // Summary Card 2: Restaurant
               _buildSummaryCard(
-                title: 'Restaurant',
+                title: context.l10n.restaurantSection,
+                editText: context.l10n.edit,
                 onEdit: () => bloc.add(const GoToStepRequested(1)),
                 rows: [
-                  _SummaryRow(label: 'Name', value: restaurantNameVal),
-                  _SummaryRow(label: 'Category', value: categoryVal),
-                  _SummaryRow(label: 'Address', value: addressVal),
+                  _SummaryRow(label: context.l10n.nameField, value: restaurantNameVal),
+                  _SummaryRow(label: context.l10n.categoryField, value: categoryVal),
+                  _SummaryRow(label: context.l10n.addressField, value: addressVal),
                 ],
               ),
               const SizedBox(height: 12),
 
               // Summary Card 3: Business information
               _buildSummaryCard(
-                title: 'Business information',
+                title: context.l10n.businessInfoSection,
+                editText: context.l10n.edit,
                 onEdit: () => bloc.add(const GoToStepRequested(2)),
                 rows: [
                   _SummaryRow(
-                    label: '[Business detail]',
+                    label: context.l10n.businessDetailLabel,
                     value: businessDetailVal,
                   ),
                   if (state.supportingDocument != null)
                     _SummaryRow(
-                      label: '[Document]',
+                      label: context.l10n.documentField,
                       value: state.supportingDocument!,
                     ),
                 ],
@@ -143,7 +163,7 @@ class RestaurantStep4View extends StatelessWidget {
                   Expanded(
                     child: Text.rich(
                         TextSpan(
-                          text: 'I agree to the ',
+                          text: context.l10n.iAgreeToThe,
                           style: GoogleFonts.poppins(
                             fontSize: 12.5,
                             color: AppColors.navy,
@@ -159,7 +179,7 @@ class RestaurantStep4View extends StatelessWidget {
                                       .pushNamed(AppRoutes.legal);
                                 },
                                 child: Text(
-                                  'Terms and Conditions',
+                                  context.l10n.termsAndConditions,
                                   style: GoogleFonts.poppins(
                                     fontSize: 12.5,
                                     color: AppColors.coral,
@@ -170,7 +190,7 @@ class RestaurantStep4View extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const TextSpan(text: ' and '),
+                            TextSpan(text: context.l10n.and),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
@@ -180,7 +200,7 @@ class RestaurantStep4View extends StatelessWidget {
                                       .pushNamed(AppRoutes.legal);
                                 },
                                 child: Text(
-                                  'Privacy Policy',
+                                  context.l10n.privacyPolicy,
                                   style: GoogleFonts.poppins(
                                     fontSize: 12.5,
                                     color: AppColors.coral,
@@ -203,7 +223,7 @@ class RestaurantStep4View extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: Text(
-                      termsError,
+                      LocalizedMessages.get(context, termsError),
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: AppColors.coral,
@@ -252,7 +272,7 @@ class RestaurantStep4View extends StatelessWidget {
                           ),
                         )
                       : Text(
-                          'Submit application',
+                          context.l10n.submitApplicationButton,
                           style: GoogleFonts.poppins(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -272,6 +292,7 @@ class RestaurantStep4View extends StatelessWidget {
     required String title,
     required VoidCallback onEdit,
     required List<_SummaryRow> rows,
+    String editText = 'Edit',
   }) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
@@ -297,7 +318,7 @@ class RestaurantStep4View extends StatelessWidget {
               GestureDetector(
                 onTap: onEdit,
                 child: Text(
-                  'Edit',
+                  editText,
                   style: GoogleFonts.poppins(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,

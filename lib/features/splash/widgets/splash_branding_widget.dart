@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
+import '../../../core/extensions/localization_extension.dart';
 
 class SplashBrandingWidget extends StatelessWidget {
   final double scale;
@@ -24,7 +24,7 @@ class SplashBrandingWidget extends StatelessWidget {
         ),
         SizedBox(height: 28 * scale),
         Text(
-          AppStrings.splashTagline,
+          context.l10n.splashTagline,
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
             fontSize: (19 * scale).clamp(17.0, 23.0),

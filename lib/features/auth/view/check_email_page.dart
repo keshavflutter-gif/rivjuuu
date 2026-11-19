@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 
 class CheckEmailPage extends StatelessWidget {
@@ -8,6 +9,7 @@ class CheckEmailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       appBar: AppBar(
@@ -72,7 +74,7 @@ class CheckEmailPage extends StatelessWidget {
 
               // Title
               Text(
-                'Check your email',
+                l10n.checkEmailTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
@@ -88,7 +90,7 @@ class CheckEmailPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  "We've sent password reset instructions to your email address.",
+                  l10n.checkEmailSubtitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -115,14 +117,14 @@ class CheckEmailPage extends StatelessWidget {
                   ),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Reset instructions resent!'),
+                      SnackBar(
+                        content: Text(l10n.resetInstructionsResent),
                         backgroundColor: AppColors.coral,
                       ),
                     );
                   },
                   child: Text(
-                    'Resend email',
+                    l10n.resendEmailButton,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -165,7 +167,7 @@ class CheckEmailPage extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    'Back to login',
+                    l10n.backToLogIn,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

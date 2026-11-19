@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
+import '../../../core/utils/localized_messages.dart';
 import '../bloc/restaurant_signup_bloc.dart';
 import '../bloc/restaurant_signup_event.dart';
 import '../bloc/restaurant_signup_state.dart';
@@ -43,7 +45,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
       SnackBar(
         duration: const Duration(seconds: 2),
         content: Text(
-          'Uploaded: $fileName',
+          LocalizedMessages.get(context, 'Uploaded: $fileName'),
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF1F7A45),
@@ -77,7 +79,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
             const SizedBox(height: 8),
 
             Text(
-              'Business information',
+              context.l10n.step3Title,
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -88,7 +90,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
             const SizedBox(height: 6),
 
             Text(
-              'We use this to verify your restaurant before it goes live.',
+              context.l10n.step3Subtitle,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: AppColors.text,
@@ -126,7 +128,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '[Business detail]',
+                      context.l10n.businessDetailLabel,
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -147,8 +149,10 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        hintText: '[Field to be confirmed]',
-                        errorText: errorText,
+                        hintText: context.l10n.businessDetailHint,
+                        errorText: errorText != null
+                            ? LocalizedMessages.get(context, errorText)
+                            : null,
                         errorStyle: GoogleFonts.poppins(
                           fontSize: 12,
                           color: AppColors.coral,
@@ -216,7 +220,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '[Supporting document]',
+                      context.l10n.supportingDocumentLabel,
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -256,7 +260,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              hasFile ? fileName! : 'Upload a file',
+                              hasFile ? fileName! : context.l10n.uploadFileButton,
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -266,8 +270,8 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                             const SizedBox(height: 2),
                             Text(
                               hasFile
-                                  ? 'Tap to change file'
-                                  : '[Accepted formats to be confirmed]',
+                                  ? context.l10n.tapToChangeFile
+                                  : context.l10n.acceptedFormatsHint,
                               style: GoogleFonts.poppins(
                                 fontSize: 11.5,
                                 color: AppColors.muted,
@@ -282,7 +286,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                       Padding(
                         padding: const EdgeInsets.only(left: 4.0),
                         child: Text(
-                          errorText,
+                          LocalizedMessages.get(context, errorText),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: AppColors.coral,
@@ -321,7 +325,7 @@ class _RestaurantStep3ViewState extends State<RestaurantStep3View>
                 ),
                 onPressed: () => bloc.add(const NextStepRequested()),
                 child: Text(
-                  'Continue',
+                  context.l10n.continueButton,
                   style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

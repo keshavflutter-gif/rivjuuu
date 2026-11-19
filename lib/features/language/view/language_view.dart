@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 import '../bloc/language_bloc.dart';
 import '../bloc/language_event.dart';
@@ -52,7 +53,7 @@ class LanguageView extends StatelessWidget {
 
                         // Title
                         Text(
-                          'Choose language',
+                          context.l10n.chooseLanguageTitle,
                           style: GoogleFonts.poppins(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
@@ -65,7 +66,7 @@ class LanguageView extends StatelessWidget {
 
                         // Subtitle
                         Text(
-                          "Select the language you'd like to use in Rivjuuu.",
+                          context.l10n.chooseLanguageSubtitle,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: AppColors.text,
@@ -81,7 +82,7 @@ class LanguageView extends StatelessWidget {
                             return Column(
                               children: [
                                 _LanguageOptionCard(
-                                  title: 'English',
+                                  title: context.l10n.languageEnglish,
                                   flag: const UkFlag(),
                                   isSelected: state.selectedLanguage == 'en',
                                   onTap: () {
@@ -92,7 +93,7 @@ class LanguageView extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 12),
                                 _LanguageOptionCard(
-                                  title: 'Hungarian',
+                                  title: context.l10n.languageHungarian,
                                   flag: const HungarianFlag(),
                                   isSelected: state.selectedLanguage == 'hu',
                                   onTap: () {
@@ -123,11 +124,18 @@ class LanguageView extends StatelessWidget {
                               ),
                             ),
                             onPressed: () {
-                              Navigator.of(context)
-                                  .pushReplacementNamed(AppRoutes.login);
+                              context
+                                  .read<LanguageBloc>()
+                                  .add(const LanguageConfirmed());
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              } else {
+                                Navigator.of(context)
+                                    .pushReplacementNamed(AppRoutes.login);
+                              }
                             },
                             child: Text(
-                              'Continue',
+                              context.l10n.continueButton,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 
 class NewPasswordPage extends StatefulWidget {
@@ -105,6 +106,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       appBar: AppBar(
@@ -124,7 +126,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
               const SizedBox(height: 8),
 
               Text(
-                'Create new password',
+                l10n.createNewPasswordTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -136,7 +138,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
               const SizedBox(height: 6),
 
               Text(
-                'Choose a new password for your account.',
+                l10n.createNewPasswordSubtitle,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: AppColors.text,
@@ -146,8 +148,8 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
               const SizedBox(height: 32),
 
               _buildPasswordField(
-                label: 'New password',
-                hint: 'Create a new password',
+                label: l10n.newPasswordLabel,
+                hint: l10n.createPasswordHint,
                 controller: _newPasswordController,
                 obscureText: _obscureNew,
                 onToggle: () {
@@ -160,8 +162,8 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
               const SizedBox(height: 16),
 
               _buildPasswordField(
-                label: 'Confirm new password',
-                hint: 'Confirm your password',
+                label: l10n.confirmNewPasswordLabel,
+                hint: l10n.confirmPasswordHint,
                 controller: _confirmPasswordController,
                 obscureText: _obscureConfirm,
                 onToggle: () {
@@ -201,7 +203,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                     Navigator.of(context).pushNamed(AppRoutes.passwordUpdated);
                   },
                   child: Text(
-                    'Reset password',
+                    l10n.resetPasswordButton,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rivjuuu/core/constants/app_colors.dart';
+import 'package:rivjuuu/core/extensions/localization_extension.dart';
 import 'package:rivjuuu/features/profile/models/user_profile_model.dart';
 
 class ProfileHeaderWidget extends StatelessWidget {
@@ -101,7 +102,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Edit',
+                context.l10n.edit,
                 style: GoogleFonts.poppins(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w500,

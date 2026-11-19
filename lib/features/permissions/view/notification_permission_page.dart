@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 
 class NotificationPermissionPage extends StatelessWidget {
@@ -8,6 +9,7 @@ class NotificationPermissionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -24,7 +26,7 @@ class NotificationPermissionPage extends StatelessWidget {
 
               // Title
               Text(
-                'Stay updated',
+                l10n.enableNotificationsTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
@@ -40,7 +42,7 @@ class NotificationPermissionPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  'Get updates about coupons, rewards, giveaways and important account activity.',
+                  l10n.enableNotificationsSubtitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -72,7 +74,7 @@ class NotificationPermissionPage extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    'Enable notifications',
+                    l10n.allowNotificationsButton,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -101,7 +103,7 @@ class NotificationPermissionPage extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    'Not now',
+                    l10n.notNowButton,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,

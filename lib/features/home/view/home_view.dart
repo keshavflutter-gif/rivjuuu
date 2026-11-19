@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
@@ -25,11 +26,38 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final ScrollController _scrollController = ScrollController();
+  DateTime? _lastBackPressTime;
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handleBackPress() {
+    final now = DateTime.now();
+    if (_lastBackPressTime == null ||
+        now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+      _lastBackPressTime = now;
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text(
+            context.l10n.tapAgainToExit,
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: AppColors.navy,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      SystemNavigator.pop();
+    }
   }
 
   void _scrollToTop() {
@@ -44,25 +72,31 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.white,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.cream,
-        body: SafeArea(
-          bottom: false,
-          child: BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, state) {
-              return SingleChildScrollView(
-                key: const PageStorageKey<String>('customer_home_scroll_view'),
-                controller: _scrollController,
-                physics: const ClampingScrollPhysics(),
-                child: Column(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackPress();
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
+          backgroundColor: AppColors.cream,
+          body: SafeArea(
+            bottom: false,
+            child: BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) {
+                return SingleChildScrollView(
+                  key: const PageStorageKey<String>('customer_home_scroll_view'),
+                  controller: _scrollController,
+                  physics: const ClampingScrollPhysics(),
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 6),
@@ -306,8 +340,9 @@ class _HomeViewState extends State<HomeView> {
           },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSectionHeader({
     required String title,

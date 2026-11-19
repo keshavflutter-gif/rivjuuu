@@ -146,6 +146,31 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         final displayName = profile?.displayName ??
             '${user?.firstName ?? ''} ${user?.lastName ?? ''}'.trim();
 
+        // Extract restaurant details if role is RESTAURANT
+        String? restId;
+        String? restName;
+        String? restCategory;
+        String? restCategoryId;
+        String? restAddress;
+        String? restCity;
+        String? restApprovalStatus;
+
+        final restaurants = user?.restaurants;
+        if (restaurants != null &&
+            restaurants.isNotEmpty &&
+            restaurants.first is Map) {
+          final rest = restaurants.first as Map<String, dynamic>;
+          restId = rest['id'] as String? ?? rest['restaurantId'] as String?;
+          restName = rest['name'] as String? ?? rest['restaurantName'] as String?;
+          restCategory = rest['category'] as String?;
+          restCategoryId = rest['categoryId'] as String?;
+          restAddress = rest['address'] as String?;
+          restCity = rest['city'] as String?;
+          restApprovalStatus =
+              (rest['approvalStatus'] as String? ?? rest['status'] as String? ?? 'PENDING')
+                  .toUpperCase();
+        }
+
         final saved = await storage.saveLoginSession(
           accessToken: response.accessToken!,
           refreshToken: response.refreshToken ?? '',
@@ -160,6 +185,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           displayName: displayName.isNotEmpty ? displayName : null,
           avatarUrl: profile?.avatarUrl,
           bio: profile?.bio,
+          restaurantId: restId,
+          restaurantName: restName,
+          restaurantCategory: restCategory,
+          restaurantCategoryId: restCategoryId,
+          restaurantAddress: restAddress,
+          restaurantCity: restCity,
+          restaurantApprovalStatus: restApprovalStatus,
         );
 
         if (!saved) {
@@ -239,6 +271,39 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
                 avatarUrl: userData['avatarUrl'],
                 bio: userData['bio'],
               ),
+            ),
+          ),
+        ));
+        return;
+      } else if (role == 'RESTAURANT') {
+        final restData = await storage.getRestaurantData();
+        emit(LoginSuccess(
+          response: LoginResponse(
+            success: 1,
+            message: AppMessages.loginSuccess,
+            accessToken: await storage.getAccessToken(),
+            refreshToken: await storage.getRefreshToken(),
+            role: role,
+            user: LoginUser(
+              id: userData['userId'] ?? '',
+              email: userData['email'] ?? '',
+              firstName: userData['firstName'],
+              lastName: userData['lastName'],
+              phone: userData['phone'],
+              role: role,
+              status: userData['status'],
+              restaurants: [
+                {
+                  'id': restData.restaurantId ?? '',
+                  'name': restData.restaurantName,
+                  'category': restData.category,
+                  'categoryId': restData.categoryId,
+                  'address': restData.address,
+                  'city': restData.city,
+                  'approvalStatus': restData.approvalStatus ?? 'PENDING',
+                  'status': userData['status'] ?? 'ACTIVE',
+                }
+              ],
             ),
           ),
         ));

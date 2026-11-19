@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/restaurant_registration/models/restaurant_registration_data.dart';
 
 /// Service responsible for managing user authentication tokens and user session data.
 ///
@@ -21,6 +22,13 @@ class TokenStorageService {
   static const String _keyCustomerProfileId = 'auth_customer_profile_id';
   static const String _keyAvatarUrl = 'auth_customer_avatar_url';
   static const String _keyBio = 'auth_customer_bio';
+  static const String _keyRestaurantId = 'auth_restaurant_id';
+  static const String _keyRestaurantName = 'auth_restaurant_name';
+  static const String _keyRestaurantCategory = 'auth_restaurant_category';
+  static const String _keyRestaurantCategoryId = 'auth_restaurant_category_id';
+  static const String _keyRestaurantAddress = 'auth_restaurant_address';
+  static const String _keyRestaurantCity = 'auth_restaurant_city';
+  static const String _keyRestaurantApprovalStatus = 'auth_restaurant_approval_status';
 
   static TokenStorageService? _instance;
   final SharedPreferences? _prefs;
@@ -87,7 +95,7 @@ class TokenStorageService {
     return true;
   }
 
-  /// Saves complete authenticated login session including customer profile details.
+  /// Saves complete authenticated login session including customer or restaurant details.
   /// Safely handles nulls and does NOT store passwords.
   Future<bool> saveLoginSession({
     required String accessToken,
@@ -103,6 +111,13 @@ class TokenStorageService {
     String? displayName,
     String? avatarUrl,
     String? bio,
+    String? restaurantId,
+    String? restaurantName,
+    String? restaurantCategory,
+    String? restaurantCategoryId,
+    String? restaurantAddress,
+    String? restaurantCity,
+    String? restaurantApprovalStatus,
   }) async {
     if (accessToken.trim().isEmpty || refreshToken.trim().isEmpty) {
       return false;
@@ -159,7 +174,104 @@ class TokenStorageService {
       await prefs.remove(_keyBio);
     }
 
+    if (restaurantId != null && restaurantId.isNotEmpty) {
+      await prefs.setString(_keyRestaurantId, restaurantId);
+    } else {
+      await prefs.remove(_keyRestaurantId);
+    }
+
+    if (restaurantName != null && restaurantName.isNotEmpty) {
+      await prefs.setString(_keyRestaurantName, restaurantName);
+    } else {
+      await prefs.remove(_keyRestaurantName);
+    }
+
+    if (restaurantCategory != null && restaurantCategory.isNotEmpty) {
+      await prefs.setString(_keyRestaurantCategory, restaurantCategory);
+    } else {
+      await prefs.remove(_keyRestaurantCategory);
+    }
+
+    if (restaurantCategoryId != null && restaurantCategoryId.isNotEmpty) {
+      await prefs.setString(_keyRestaurantCategoryId, restaurantCategoryId);
+    } else {
+      await prefs.remove(_keyRestaurantCategoryId);
+    }
+
+    if (restaurantAddress != null && restaurantAddress.isNotEmpty) {
+      await prefs.setString(_keyRestaurantAddress, restaurantAddress);
+    } else {
+      await prefs.remove(_keyRestaurantAddress);
+    }
+
+    if (restaurantCity != null && restaurantCity.isNotEmpty) {
+      await prefs.setString(_keyRestaurantCity, restaurantCity);
+    } else {
+      await prefs.remove(_keyRestaurantCity);
+    }
+
+    if (restaurantApprovalStatus != null && restaurantApprovalStatus.isNotEmpty) {
+      await prefs.setString(_keyRestaurantApprovalStatus, restaurantApprovalStatus);
+    } else {
+      await prefs.remove(_keyRestaurantApprovalStatus);
+    }
+
     return true;
+  }
+
+  /// Saves or updates restaurant details in storage.
+  Future<void> saveRestaurantData(RestaurantRegistrationData data) async {
+    final prefs = await _getPrefs();
+    if (data.restaurantId != null && data.restaurantId!.isNotEmpty) {
+      await prefs.setString(_keyRestaurantId, data.restaurantId!);
+    }
+    if (data.restaurantName.isNotEmpty) {
+      await prefs.setString(_keyRestaurantName, data.restaurantName);
+    }
+    if (data.category.isNotEmpty) {
+      await prefs.setString(_keyRestaurantCategory, data.category);
+    }
+    if (data.categoryId.isNotEmpty) {
+      await prefs.setString(_keyRestaurantCategoryId, data.categoryId);
+    }
+    if (data.address.isNotEmpty) {
+      await prefs.setString(_keyRestaurantAddress, data.address);
+    }
+    if (data.city.isNotEmpty) {
+      await prefs.setString(_keyRestaurantCity, data.city);
+    }
+    if (data.approvalStatus != null && data.approvalStatus!.isNotEmpty) {
+      await prefs.setString(_keyRestaurantApprovalStatus, data.approvalStatus!);
+    }
+    if (data.ownerName.isNotEmpty) {
+      await prefs.setString(_keyDisplayName, data.ownerName);
+    }
+    if (data.email.isNotEmpty) {
+      await prefs.setString(_keyEmail, data.email);
+    }
+  }
+
+  /// Retrieves the stored restaurant registration data.
+  Future<RestaurantRegistrationData> getRestaurantData() async {
+    final prefs = await _getPrefs();
+    final firstName = prefs.getString(_keyFirstName) ?? '';
+    final lastName = prefs.getString(_keyLastName) ?? '';
+    final displayName = prefs.getString(_keyDisplayName);
+    final ownerName = (displayName != null && displayName.isNotEmpty)
+        ? displayName
+        : '$firstName $lastName'.trim();
+
+    return RestaurantRegistrationData(
+      ownerName: ownerName,
+      email: prefs.getString(_keyEmail) ?? '',
+      restaurantName: prefs.getString(_keyRestaurantName) ?? '',
+      category: prefs.getString(_keyRestaurantCategory) ?? '',
+      categoryId: prefs.getString(_keyRestaurantCategoryId) ?? '',
+      address: prefs.getString(_keyRestaurantAddress) ?? '',
+      city: prefs.getString(_keyRestaurantCity) ?? 'Budapest',
+      restaurantId: prefs.getString(_keyRestaurantId),
+      approvalStatus: prefs.getString(_keyRestaurantApprovalStatus) ?? 'PENDING',
+    );
   }
 
   Future<String?> getAccessToken() async {
@@ -206,6 +318,13 @@ class TokenStorageService {
       'customerProfileId': prefs.getString(_keyCustomerProfileId),
       'avatarUrl': prefs.getString(_keyAvatarUrl),
       'bio': prefs.getString(_keyBio),
+      'restaurantId': prefs.getString(_keyRestaurantId),
+      'restaurantName': prefs.getString(_keyRestaurantName),
+      'restaurantCategory': prefs.getString(_keyRestaurantCategory),
+      'restaurantCategoryId': prefs.getString(_keyRestaurantCategoryId),
+      'restaurantAddress': prefs.getString(_keyRestaurantAddress),
+      'restaurantCity': prefs.getString(_keyRestaurantCity),
+      'restaurantApprovalStatus': prefs.getString(_keyRestaurantApprovalStatus),
     };
   }
 
@@ -230,6 +349,13 @@ class TokenStorageService {
     await prefs.remove(_keyCustomerProfileId);
     await prefs.remove(_keyAvatarUrl);
     await prefs.remove(_keyBio);
+    await prefs.remove(_keyRestaurantId);
+    await prefs.remove(_keyRestaurantName);
+    await prefs.remove(_keyRestaurantCategory);
+    await prefs.remove(_keyRestaurantCategoryId);
+    await prefs.remove(_keyRestaurantAddress);
+    await prefs.remove(_keyRestaurantCity);
+    await prefs.remove(_keyRestaurantApprovalStatus);
   }
 }
 

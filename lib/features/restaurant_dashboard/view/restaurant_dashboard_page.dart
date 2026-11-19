@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/widgets/restaurant_bottom_nav_bar.dart';
 import '../../restaurant_coupons/view/restaurant_coupons_page.dart';
@@ -26,6 +27,7 @@ class RestaurantDashboardPage extends StatefulWidget {
 class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
   late int _currentNavIndex;
   late final ScrollController _scrollController;
+  DateTime? _lastBackPressTime;
 
   @override
   void initState() {
@@ -48,6 +50,37 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
     super.dispose();
   }
 
+  void _handleBackPress() {
+    if (_currentNavIndex != 0) {
+      setState(() => _currentNavIndex = 0);
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_lastBackPressTime == null ||
+        now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+      _lastBackPressTime = now;
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text(
+            context.l10n.tapAgainToExit,
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: AppColors.navy,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      SystemNavigator.pop();
+    }
+  }
+
   String _formatInitials(String name) {
     if (name.trim().isEmpty) return 'NR';
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -68,35 +101,42 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
         : d.restaurantName;
     final initials = _formatInitials(restaurantName);
 
-    return Scaffold(
-      backgroundColor: AppColors.cream,
-      body: SafeArea(
-        bottom: false,
-        child: IndexedStack(
-          index: _currentNavIndex,
-          children: [
-            _buildDashboardContent(restaurantName, initials),
-            const RestaurantCouponsContentView(),
-            _buildScanPlaceholder(),
-            const RestaurantActivityContentView(),
-            RestaurantAccountContentView(
-              data: widget.data,
-              onSelectTab: (idx) {
-                setState(() => _currentNavIndex = idx);
-              },
-            ),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackPress();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.cream,
+        body: SafeArea(
+          bottom: false,
+          child: IndexedStack(
+            index: _currentNavIndex,
+            children: [
+              _buildDashboardContent(restaurantName, initials),
+              const RestaurantCouponsContentView(),
+              _buildScanPlaceholder(),
+              const RestaurantActivityContentView(),
+              RestaurantAccountContentView(
+                data: widget.data,
+                onSelectTab: (idx) {
+                  setState(() => _currentNavIndex = idx);
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: RestaurantBottomNavBar(
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
-          if (index == 2) {
-            Navigator.pushNamed(context, AppRoutes.restaurantScanner);
-          } else {
-            setState(() => _currentNavIndex = index);
-          }
-        },
+        bottomNavigationBar: RestaurantBottomNavBar(
+          currentIndex: _currentNavIndex,
+          onTap: (index) {
+            if (index == 2) {
+              Navigator.pushNamed(context, AppRoutes.restaurantScanner);
+            } else {
+              setState(() => _currentNavIndex = index);
+            }
+          },
+        ),
       ),
     );
   }
@@ -134,7 +174,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Good evening',
+                      context.l10n.goodEvening,
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         height: 1.33,
@@ -229,9 +269,9 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                           size: 16,
                           color: AppColors.coral,
                         ),
-                        label: 'Active coupons',
+                        label: context.l10n.activeCoupons,
                         value: '4',
-                        sub: '1 ends this week',
+                        sub: context.l10n.oneEndsThisWeek,
                         onTap: () {
                           setState(() => _currentNavIndex = 1);
                         },
@@ -251,9 +291,9 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             size: 16,
                             color: AppColors.coral,
                           ),
-                          label: 'Points given',
+                          label: context.l10n.pointsGiven,
                           value: '720',
-                          sub: 'This week',
+                          sub: context.l10n.thisWeek,
                           isUp: true,
                         ),
                       ),
@@ -276,9 +316,9 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             size: 16,
                             color: AppColors.coral,
                           ),
-                          label: 'Giveaway entries',
+                          label: context.l10n.giveawayEntries,
                           value: '1,248',
-                          sub: 'Draw on 15 Oct',
+                          sub: context.l10n.drawOnDate,
                         ),
                       ),
                     ),
@@ -296,7 +336,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             size: 16,
                             color: AppColors.coral,
                           ),
-                          label: 'Profile views',
+                          label: context.l10n.profileViews,
                           value: '2,310',
                           sub: '+12% this week',
                           isUp: true,
@@ -310,7 +350,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
 
                 // Quick Actions Section (.sec)
                 Text(
-                  'Quick actions',
+                  context.l10n.quickActions,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     height: 1.33,
@@ -330,7 +370,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             size: 20,
                             color: Colors.white,
                           ),
-                          label: 'Scan QR',
+                          label: context.l10n.scanQr,
                           isMain: true,
                           onTap: () {
                             Navigator.pushNamed(
@@ -348,7 +388,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             size: 20,
                             color: AppColors.coral,
                           ),
-                          label: 'Create coupon',
+                          label: context.l10n.createCoupon,
                           isMain: false,
                           onTap: () {
                             Navigator.pushNamed(
@@ -365,7 +405,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             size: 20,
                             color: AppColors.coral,
                           ),
-                          label: 'Create giveaway',
+                          label: context.l10n.createGiveaway,
                           isMain: false,
                           onTap: () {
                             Navigator.pushNamed(
@@ -387,22 +427,27 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(
-                      'Recent activity',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        height: 1.33,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.18,
-                        color: AppColors.navy,
+                    Expanded(
+                      child: Text(
+                        context.l10n.recentActivity,
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          height: 1.33,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.18,
+                          color: AppColors.navy,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () {
                         setState(() => _currentNavIndex = 3);
                       },
                       child: Text(
-                        'See all',
+                        context.l10n.seeAll,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -446,7 +491,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Growth plan',
+                                context.l10n.growthPlan,
                                 style: GoogleFonts.poppins(
                                   fontSize: 14.5,
                                   height: 1.38,
@@ -456,7 +501,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                               ),
                               const SizedBox(height: 1),
                               Text(
-                                'Renews 14 Nov 2026 · 4 of 10 coupons used',
+                                context.l10n.planRenewsText,
                                 style: GoogleFonts.poppins(
                                   fontSize: 11.5,
                                   height: 1.39,
@@ -467,7 +512,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                           ),
                         ),
                         Text(
-                          'Manage',
+                          context.l10n.manage,
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -526,7 +571,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Redeemed',
+                    context.l10n.redeemed,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -545,7 +590,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
             title: 'Bence T. used Free espresso',
             subtitle: '18:15 · −150 points',
             trailing: Text(
-              'Reward',
+              context.l10n.reward,
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -600,7 +645,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Redemptions today',
+                      context.l10n.redemptionsToday,
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         height: 1.33,
@@ -650,7 +695,7 @@ class _RestaurantDashboardPageState extends State<RestaurantDashboardPage> {
                 ),
               ),
               child: Text(
-                'Scan QR',
+                context.l10n.scanQr,
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,

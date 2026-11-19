@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/storage/token_storage_service.dart';
+import '../../../core/utils/localized_messages.dart';
+import '../../language/bloc/language_bloc.dart';
+import '../../language/bloc/language_event.dart';
+import '../../language/bloc/language_state.dart';
 
 /// Restaurant Settings Screen
 /// Matching batch-05-restaurant-app/html/settings.html & settings-language.html
 class RestaurantSettingsPage extends StatefulWidget {
-  const RestaurantSettingsPage({super.key});
+  final LanguageBloc? languageBloc;
+  const RestaurantSettingsPage({super.key, this.languageBloc});
 
   @override
   State<RestaurantSettingsPage> createState() => _RestaurantSettingsPageState();
 }
 
 class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
-  String _selectedLanguage = 'English';
+  String _selectedLanguage = 'en';
 
+  LanguageBloc? _getLanguageBloc() {
+    if (widget.languageBloc != null) return widget.languageBloc;
+    try {
+      return context.read<LanguageBloc>();
+    } catch (_) {
+      return null;
+    }
+  }
   // Notification Preferences matching settings.html
   bool _couponRedemptions = true;
   bool _giveawayUpdates = true;
@@ -75,7 +91,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Change password',
+                            context.l10n.changePassword,
                             style: GoogleFonts.poppins(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -107,7 +123,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       const SizedBox(height: 18),
 
                       // 1. Current password
-                      _buildFieldLabel('Current password'),
+                      _buildFieldLabel(context.l10n.currentPasswordLabel),
                       const SizedBox(height: 6),
                       TextField(
                         controller: currentPassController,
@@ -118,7 +134,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                           color: AppColors.navy,
                         ),
                         decoration: _buildInputDecoration(
-                          hintText: 'Enter current password',
+                          hintText: context.l10n.enterCurrentPasswordHint,
                           suffixIcon: IconButton(
                             icon: Icon(
                               obscureCurrent
@@ -139,7 +155,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       const SizedBox(height: 14),
 
                       // 2. New password
-                      _buildFieldLabel('New password'),
+                      _buildFieldLabel(context.l10n.newPasswordLabel),
                       const SizedBox(height: 6),
                       TextField(
                         controller: newPassController,
@@ -150,7 +166,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                           color: AppColors.navy,
                         ),
                         decoration: _buildInputDecoration(
-                          hintText: 'Enter new password (min. 8 characters)',
+                          hintText: context.l10n.enterNewPasswordHint,
                           suffixIcon: IconButton(
                             icon: Icon(
                               obscureNew
@@ -171,7 +187,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       const SizedBox(height: 14),
 
                       // 3. Confirm new password
-                      _buildFieldLabel('Confirm new password'),
+                      _buildFieldLabel(context.l10n.confirmNewPasswordLabel),
                       const SizedBox(height: 6),
                       TextField(
                         controller: confirmPassController,
@@ -182,7 +198,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                           color: AppColors.navy,
                         ),
                         decoration: _buildInputDecoration(
-                          hintText: 'Re-enter new password',
+                          hintText: context.l10n.confirmNewPasswordHint,
                           suffixIcon: IconButton(
                             icon: Icon(
                               obscureConfirm
@@ -215,7 +231,10 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'Please fill in all password fields.',
+                                    LocalizedMessages.get(
+                                      context,
+                                      'Please fill in all password fields.',
+                                    ),
                                     style: GoogleFonts.poppins(color: Colors.white),
                                   ),
                                   backgroundColor: AppColors.navy,
@@ -230,7 +249,10 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'New passwords do not match.',
+                                    LocalizedMessages.get(
+                                      context,
+                                      'New passwords do not match.',
+                                    ),
                                     style: GoogleFonts.poppins(color: Colors.white),
                                   ),
                                   backgroundColor: const Color(0xFFFE552E),
@@ -245,7 +267,10 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Password changed successfully!',
+                                  LocalizedMessages.get(
+                                    context,
+                                    'Password changed successfully!',
+                                  ),
                                   style: GoogleFonts.poppins(color: Colors.white),
                                 ),
                                 backgroundColor: AppColors.navy,
@@ -266,7 +291,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                             ),
                           ),
                           child: Text(
-                            'Update password',
+                            context.l10n.updatePasswordButton,
                             style: GoogleFonts.poppins(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -287,120 +312,130 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
 
   void _showLanguageSheet() {
     HapticFeedback.lightImpact();
+    final langBloc = _getLanguageBloc();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return StatefulBuilder(
-          builder: (sheetContext, setModalState) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-              ),
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 34),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Handle
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.line,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+        Widget buildSheetContent(String activeLang) {
+          final isEn = activeLang == 'en';
+          final isHu = activeLang == 'hu';
+
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 34),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.line,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
+                  ),
 
-                    // Head
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Language',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.navy,
-                          ),
+                  // Head
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        ctx.l10n.language,
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.navy,
                         ),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(ctx),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.line),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                LucideIcons.x,
-                                size: 18,
-                                color: AppColors.navy,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // English Option
-                    _buildLanguageItem(
-                      name: 'English',
-                      isSelected: _selectedLanguage == 'English',
-                      flagWidget: _buildEnglishFlag(),
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        setState(() {
-                          _selectedLanguage = 'English';
-                        });
-                        setModalState(() {});
-                        Navigator.pop(ctx);
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Hungarian Option
-                    _buildLanguageItem(
-                      name: 'Hungarian',
-                      isSelected: _selectedLanguage == 'Hungarian',
-                      flagWidget: _buildHungarianFlag(),
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        setState(() {
-                          _selectedLanguage = 'Hungarian';
-                        });
-                        setModalState(() {});
-                        Navigator.pop(ctx);
-                      },
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    Text(
-                      'Changes apply straight away.',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: AppColors.text,
                       ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(ctx),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.line),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              LucideIcons.x,
+                              size: 18,
+                              color: AppColors.navy,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // English Option
+                  _buildLanguageItem(
+                    name: ctx.l10n.languageEnglish,
+                    isSelected: isEn,
+                    flagWidget: _buildEnglishFlag(),
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _selectedLanguage = 'en');
+                      langBloc?.add(const LanguageSelected('en'));
+                      langBloc?.add(const LanguageConfirmed());
+                      Navigator.pop(ctx);
+                    },
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Hungarian Option
+                  _buildLanguageItem(
+                    name: ctx.l10n.languageHungarian,
+                    isSelected: isHu,
+                    flagWidget: _buildHungarianFlag(),
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _selectedLanguage = 'hu');
+                      langBloc?.add(const LanguageSelected('hu'));
+                      langBloc?.add(const LanguageConfirmed());
+                      Navigator.pop(ctx);
+                    },
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  Text(
+                    ctx.l10n.changesApplyStraightAway,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: AppColors.text,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        );
+            ),
+          );
+        }
+
+        if (langBloc != null) {
+          return BlocBuilder<LanguageBloc, LanguageState>(
+            bloc: langBloc,
+            builder: (sheetContext, state) =>
+                buildSheetContent(state.selectedLanguage),
+          );
+        } else {
+          return buildSheetContent(_selectedLanguage);
+        }
       },
     );
   }
@@ -433,7 +468,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Close',
+              ctx.l10n.close,
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 color: AppColors.coral,
@@ -453,7 +488,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: Text(
-          'Log out',
+          context.l10n.logOutTitle,
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -461,7 +496,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
           ),
         ),
         content: Text(
-          'Are you sure you want to log out of your restaurant account?',
+          context.l10n.restaurantLogoutConfirmation,
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -472,7 +507,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              context.l10n.cancel,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -481,13 +516,17 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.accountType,
-                (route) => false,
-              );
+              final storage = await TokenStorageService.getInstance();
+              await storage.clearSession();
+              if (mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.login,
+                  (route) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFE552E),
@@ -498,7 +537,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
               ),
             ),
             child: Text(
-              'Log out',
+              context.l10n.logOutButton,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -512,6 +551,24 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    String currentLang = _selectedLanguage;
+    final bloc = _getLanguageBloc();
+    if (bloc != null) {
+      try {
+        currentLang = context.watch<LanguageBloc>().state.selectedLanguage;
+      } catch (_) {
+        currentLang = bloc.state.selectedLanguage;
+      }
+    } else {
+      final localeCode = Localizations.maybeLocaleOf(context)?.languageCode;
+      if (localeCode != null && _selectedLanguage == 'en' && localeCode == 'hu') {
+        currentLang = 'hu';
+      }
+    }
+    final isHungarian = currentLang == 'hu';
+    final selectedLanguageDisplay =
+        isHungarian ? context.l10n.languageHungarian : context.l10n.languageEnglish;
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -548,7 +605,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                   ),
                   Expanded(
                     child: Text(
-                      'Settings',
+                      context.l10n.settingsItem,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 18,
@@ -571,20 +628,20 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Section 1: Account
-                    _buildSectionHeader('Account'),
+                    _buildSectionHeader(context.l10n.accountSection),
                     const SizedBox(height: 8),
                     _buildRowsContainer([
                       _buildRowItem(
                         icon: LucideIcons.lock,
-                        label: 'Change password',
+                        label: context.l10n.changePassword,
                         onTap: _showChangePasswordSheet,
                         showChevron: true,
                       ),
                       _buildRowDivider(),
                       _buildRowItem(
                         icon: LucideIcons.globe,
-                        label: 'Language',
-                        value: _selectedLanguage,
+                        label: context.l10n.language,
+                        value: selectedLanguageDisplay,
                         onTap: _showLanguageSheet,
                         showChevron: true,
                       ),
@@ -593,12 +650,12 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                     const SizedBox(height: 22),
 
                     // Section 2: Notification preferences
-                    _buildSectionHeader('Notification preferences'),
+                    _buildSectionHeader(context.l10n.notificationPreferences),
                     const SizedBox(height: 8),
                     _buildRowsContainer([
                       _buildSwitchRow(
                         icon: LucideIcons.scan,
-                        label: 'Coupon redemptions',
+                        label: context.l10n.couponRedemptions,
                         value: _couponRedemptions,
                         onChanged: (val) {
                           setState(() => _couponRedemptions = val);
@@ -607,7 +664,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       _buildRowDivider(),
                       _buildSwitchRow(
                         icon: LucideIcons.gift,
-                        label: 'Giveaway updates',
+                        label: context.l10n.giveawayUpdates,
                         value: _giveawayUpdates,
                         onChanged: (val) {
                           setState(() => _giveawayUpdates = val);
@@ -616,7 +673,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       _buildRowDivider(),
                       _buildSwitchRow(
                         icon: LucideIcons.award,
-                        label: 'Loyalty rewards',
+                        label: context.l10n.loyaltyRewards,
                         value: _loyaltyRewards,
                         onChanged: (val) {
                           setState(() => _loyaltyRewards = val);
@@ -625,7 +682,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       _buildRowDivider(),
                       _buildSwitchRow(
                         icon: LucideIcons.creditCard,
-                        label: 'Subscription & billing',
+                        label: context.l10n.subscriptionBilling,
                         value: _subscriptionBilling,
                         onChanged: (val) {
                           setState(() => _subscriptionBilling = val);
@@ -636,16 +693,16 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                     const SizedBox(height: 22),
 
                     // Section 3: Support & legal
-                    _buildSectionHeader('Support & legal'),
+                    _buildSectionHeader(context.l10n.supportAndLegal),
                     const SizedBox(height: 8),
                     _buildRowsContainer([
                       _buildRowItem(
                         icon: LucideIcons.helpCircle,
-                        label: 'Help & contact support',
+                        label: context.l10n.helpAndContactSupport,
                         onTap: () {
                           _showInfoDialog(
-                            'Support',
-                            'Need help with your restaurant profile, coupons, or billing?\n\nReach our merchant team at support@rivjuuu.com or via live chat during business hours (9:00 - 18:00 CET).',
+                            context.l10n.supportDialogTitle,
+                            context.l10n.supportDialogContent,
                           );
                         },
                         showChevron: true,
@@ -653,11 +710,11 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       _buildRowDivider(),
                       _buildRowItem(
                         icon: LucideIcons.fileText,
-                        label: 'Privacy Policy',
+                        label: context.l10n.privacyPolicy,
                         onTap: () {
                           _showInfoDialog(
-                            'Privacy Policy',
-                            'Rivjuuu protects your restaurant and customer data in accordance with GDPR and applicable EU privacy laws. We never sell your business or consumer data to third parties.',
+                            context.l10n.privacyPolicy,
+                            context.l10n.privacyPolicyDialogContent,
                           );
                         },
                         showChevron: true,
@@ -665,11 +722,11 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                       _buildRowDivider(),
                       _buildRowItem(
                         icon: LucideIcons.fileText,
-                        label: 'Terms and Conditions',
+                        label: context.l10n.termsAndConditions,
                         onTap: () {
                           _showInfoDialog(
-                            'Terms and Conditions',
-                            'By using Rivjuuu Restaurant Merchant portal, you agree to fulfill redeemed coupons, loyalty rewards, and giveaways in good faith. Standard merchant service terms apply.',
+                            context.l10n.termsAndConditions,
+                            context.l10n.termsDialogContent,
                           );
                         },
                         showChevron: true,
@@ -682,7 +739,7 @@ class _RestaurantSettingsPageState extends State<RestaurantSettingsPage> {
                     _buildRowsContainer([
                       _buildRowItem(
                         icon: LucideIcons.logOut,
-                        label: 'Log out',
+                        label: context.l10n.logOutButton,
                         onTap: _confirmLogout,
                         isDanger: true,
                       ),

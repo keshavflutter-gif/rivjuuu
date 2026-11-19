@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/storage/token_storage_service.dart';
+import '../../../core/utils/localized_messages.dart';
 import '../bloc/restaurant_signup_bloc.dart';
 import '../bloc/restaurant_signup_event.dart';
 import '../bloc/restaurant_signup_state.dart';
@@ -122,18 +125,23 @@ class _RestaurantSignupFlowPageState extends State<RestaurantSignupFlowPage> {
                         if (state.submissionStatus == SubmissionStatus.success) {
                           final data =
                               RestaurantRegistrationData.fromBlocState(state);
+                          TokenStorageService.getInstance().then((storage) {
+                            storage.saveRestaurantData(data);
+                          });
                           Navigator.of(context).pushReplacementNamed(
                             AppRoutes.registrationPending,
                             arguments: data,
                           );
                         } else if (state.submissionStatus ==
                             SubmissionStatus.failure) {
+                          final msg = state.errorMessage != null
+                              ? LocalizedMessages.get(context, state.errorMessage)
+                              : context.l10n.submissionFailed;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               duration: const Duration(seconds: 2),
                               content: Text(
-                                state.errorMessage ??
-                                    'Submission failed. Please try again.',
+                                msg,
                                 style: GoogleFonts.poppins(color: Colors.white),
                               ),
                               backgroundColor: const Color(0xFFE03131),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/widgets/feather_award_icon.dart';
 
@@ -16,6 +17,7 @@ class HomeBottomNavWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -34,7 +36,7 @@ class HomeBottomNavWidget extends StatelessWidget {
                   context,
                   0,
                   icon: Icons.home_outlined,
-                  label: 'Home',
+                  label: l10n.navHome,
                 ),
               ),
               Expanded(
@@ -42,7 +44,7 @@ class HomeBottomNavWidget extends StatelessWidget {
                   context,
                   1,
                   icon: Icons.explore_outlined,
-                  label: 'Explore',
+                  label: l10n.navExplore,
                 ),
               ),
               Expanded(
@@ -54,7 +56,7 @@ class HomeBottomNavWidget extends StatelessWidget {
                     size: 22,
                     color: color,
                   ),
-                  label: 'Rewards',
+                  label: l10n.navRewards,
                 ),
               ),
               Expanded(
@@ -62,7 +64,7 @@ class HomeBottomNavWidget extends StatelessWidget {
                   context,
                   3,
                   icon: Icons.show_chart_rounded,
-                  label: 'Activity',
+                  label: l10n.navActivity,
                 ),
               ),
               Expanded(
@@ -70,7 +72,7 @@ class HomeBottomNavWidget extends StatelessWidget {
                   context,
                   4,
                   icon: Icons.person_outline_rounded,
-                  label: 'Profile',
+                  label: l10n.navProfile,
                 ),
               ),
             ],

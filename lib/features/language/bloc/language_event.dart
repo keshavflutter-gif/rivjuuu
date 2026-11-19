@@ -7,6 +7,10 @@ abstract class LanguageEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class LanguageInitialized extends LanguageEvent {
+  const LanguageInitialized();
+}
+
 class LanguageSelected extends LanguageEvent {
   final String languageCode;
 
@@ -16,3 +20,6 @@ class LanguageSelected extends LanguageEvent {
   List<Object?> get props => [languageCode];
 }
 
+class LanguageConfirmed extends LanguageEvent {
+  const LanguageConfirmed();
+}

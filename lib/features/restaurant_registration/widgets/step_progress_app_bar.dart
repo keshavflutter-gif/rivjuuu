@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 
 class StepProgressAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int step; // 1, 2, 3, 4
@@ -31,7 +32,7 @@ class StepProgressAppBar extends StatelessWidget implements PreferredSizeWidget 
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Step $step of 4',
+            context.l10n.stepProgress(step),
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w600,

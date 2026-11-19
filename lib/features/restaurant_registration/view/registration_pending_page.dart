@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/storage/token_storage_service.dart';
+import '../../../core/utils/localized_messages.dart';
 import '../models/restaurant_registration_data.dart';
 
 class RegistrationPendingPage extends StatefulWidget {
@@ -65,7 +68,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'Submitted details',
+                    context.l10n.submittedDetailsTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -73,15 +76,15 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _modalDetailRow('Owner name', d.ownerName.isEmpty ? 'Márton Szabó' : d.ownerName),
-                  _modalDetailRow('Owner email', d.email.isEmpty ? 'hello@nonnarosa.hu' : d.email),
-                  _modalDetailRow('Restaurant name', d.restaurantName.isEmpty ? 'Trattoria Nonna Rosa' : d.restaurantName),
-                  _modalDetailRow('Category', d.category.isEmpty ? 'Italian' : d.category),
-                  _modalDetailRow('Address', d.address.isEmpty ? 'Fő utca 12, Hungary' : d.address),
+                  _modalDetailRow(context.l10n.ownerNameField, d.ownerName.isEmpty ? 'Márton Szabó' : d.ownerName),
+                  _modalDetailRow(context.l10n.ownerEmailField, d.email.isEmpty ? 'hello@nonnarosa.hu' : d.email),
+                  _modalDetailRow(context.l10n.restaurantNameField, d.restaurantName.isEmpty ? 'Trattoria Nonna Rosa' : d.restaurantName),
+                  _modalDetailRow(context.l10n.categoryField, d.category.isEmpty ? 'Italian' : d.category),
+                  _modalDetailRow(context.l10n.addressField, d.address.isEmpty ? 'Fő utca 12, Hungary' : d.address),
                   if (d.businessDetail.isNotEmpty)
-                    _modalDetailRow('Business detail', d.businessDetail),
+                    _modalDetailRow(context.l10n.businessDetailLabel, d.businessDetail),
                   if (d.uploadedFileName != null)
-                    _modalDetailRow('Document', d.uploadedFileName!),
+                    _modalDetailRow(context.l10n.documentField, d.uploadedFileName!),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -97,7 +100,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                         ),
                       ),
                       child: Text(
-                        'Close',
+                        context.l10n.close,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -177,8 +180,12 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                     fit: BoxFit.contain,
                   ),
                   InkWell(
-                    onTap: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
+                    onTap: () async {
+                      final storage = await TokenStorageService.getInstance();
+                      await storage.clearSession();
+                      if (!mounted) return;
+                      Navigator.pushNamedAndRemoveUntil(
+                        this.context,
                         AppRoutes.login,
                         (route) => false,
                       );
@@ -199,7 +206,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Log out',
+                            context.l10n.logOutButton,
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -237,7 +244,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
               const SizedBox(height: 24),
 
               Text(
-                'Application under review',
+                context.l10n.applicationUnderReviewTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
@@ -250,7 +257,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Your restaurant application has been submitted and is waiting for review.',
+                  context.l10n.applicationUnderReviewSubtitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 13.5,
@@ -330,11 +337,11 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                     const SizedBox(height: 12),
 
                     // Email row
-                    _buildSummaryRow('Email', email),
+                    _buildSummaryRow(context.l10n.emailField, email),
                     const SizedBox(height: 8),
 
                     // Submitted date row
-                    _buildSummaryRow('Submitted', '29 Sep 2026'),
+                    _buildSummaryRow(context.l10n.submittedLabel, '29 Sep 2026'),
                     const SizedBox(height: 8),
 
                     // Status row
@@ -342,7 +349,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Status',
+                          context.l10n.statusLabel,
                           style: GoogleFonts.poppins(
                             fontSize: 12.5,
                             color: AppColors.text,
@@ -358,7 +365,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            'Pending review',
+                            context.l10n.pendingReview,
                             style: GoogleFonts.poppins(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w600,
@@ -387,7 +394,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                     ),
                   ),
                   child: Text(
-                    'View submitted details',
+                    context.l10n.viewSubmittedDetails,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -404,7 +411,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                       SnackBar(
                         duration: const Duration(seconds: 2),
                         content: Text(
-                          'Support email: support@rivjuuu.com',
+                          LocalizedMessages.get(context, 'Support email: support@rivjuuu.com'),
                           style: GoogleFonts.poppins(color: Colors.white),
                         ),
                         backgroundColor: const Color(0xFF1F7A45),
@@ -416,7 +423,7 @@ class _RegistrationPendingPageState extends State<RegistrationPendingPage> {
                     );
                   },
                   child: Text(
-                    'Contact support',
+                    context.l10n.contactSupport,
                     style: GoogleFonts.poppins(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w500,

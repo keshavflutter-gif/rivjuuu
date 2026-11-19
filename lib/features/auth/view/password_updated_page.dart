@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 
 class PasswordUpdatedPage extends StatelessWidget {
@@ -8,6 +9,7 @@ class PasswordUpdatedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -50,7 +52,7 @@ class PasswordUpdatedPage extends StatelessWidget {
 
               // Title
               Text(
-                'Password updated',
+                l10n.passwordUpdatedTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
@@ -66,7 +68,7 @@ class PasswordUpdatedPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  'Your password has been changed successfully.',
+                  l10n.passwordUpdatedSubtitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -110,7 +112,7 @@ class PasswordUpdatedPage extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    'Back to login',
+                    l10n.backToLogIn,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/extensions/localization_extension.dart';
+import '../../../core/utils/localized_messages.dart';
 import '../bloc/restaurant_signup_bloc.dart';
 import '../bloc/restaurant_signup_event.dart';
 import '../bloc/restaurant_signup_state.dart';
@@ -77,7 +79,7 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
             const SizedBox(height: 8),
 
             Text(
-              'Account information',
+              context.l10n.step1Title,
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -88,7 +90,7 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
             const SizedBox(height: 6),
 
             Text(
-              "You'll use these details to log in.",
+              context.l10n.step1Subtitle,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: AppColors.text,
@@ -102,11 +104,12 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
                   prev.validationErrors['ownerName'] !=
                   curr.validationErrors['ownerName'],
               builder: (context, state) {
+                final err = state.validationErrors['ownerName'];
                 return _buildField(
-                  label: 'Owner or contact name',
-                  hint: 'Your full name',
+                  label: context.l10n.ownerNameLabel,
+                  hint: context.l10n.ownerNameHint,
                   controller: _nameController,
-                  errorText: state.validationErrors['ownerName'],
+                  errorText: err != null ? LocalizedMessages.get(context, err) : null,
                   onChanged: (val) => bloc.add(OwnerNameChanged(val)),
                 );
               },
@@ -119,12 +122,13 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
                   prev.validationErrors['email'] !=
                   curr.validationErrors['email'],
               builder: (context, state) {
+                final err = state.validationErrors['email'];
                 return _buildField(
-                  label: 'Email address',
-                  hint: 'you@example.com',
+                  label: context.l10n.emailLabel,
+                  hint: context.l10n.emailHint,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  errorText: state.validationErrors['email'],
+                  errorText: err != null ? LocalizedMessages.get(context, err) : null,
                   onChanged: (val) => bloc.add(EmailChanged(val)),
                 );
               },
@@ -138,12 +142,13 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
                   prev.validationErrors['password'] !=
                       curr.validationErrors['password'],
               builder: (context, state) {
+                final err = state.validationErrors['password'];
                 return _buildField(
-                  label: 'Password',
-                  hint: 'Create a password',
+                  label: context.l10n.passwordLabel,
+                  hint: context.l10n.createPasswordHint,
                   controller: _passwordController,
                   obscureText: !state.isPasswordVisible,
-                  errorText: state.validationErrors['password'],
+                  errorText: err != null ? LocalizedMessages.get(context, err) : null,
                   onChanged: (val) => bloc.add(PasswordChanged(val)),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -169,12 +174,13 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
                   prev.validationErrors['confirmPassword'] !=
                       curr.validationErrors['confirmPassword'],
               builder: (context, state) {
+                final err = state.validationErrors['confirmPassword'];
                 return _buildField(
-                  label: 'Confirm password',
-                  hint: 'Confirm your password',
+                  label: context.l10n.confirmPasswordLabel,
+                  hint: context.l10n.confirmPasswordHint,
                   controller: _confirmPasswordController,
                   obscureText: !state.isConfirmPasswordVisible,
-                  errorText: state.validationErrors['confirmPassword'],
+                  errorText: err != null ? LocalizedMessages.get(context, err) : null,
                   onChanged: (val) => bloc.add(ConfirmPasswordChanged(val)),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -217,7 +223,7 @@ class _RestaurantStep1ViewState extends State<RestaurantStep1View>
                 ),
                 onPressed: () => bloc.add(const NextStepRequested()),
                 child: Text(
-                  'Continue',
+                  context.l10n.continueButton,
                   style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

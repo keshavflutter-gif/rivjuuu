@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
+import '../../../core/extensions/localization_extension.dart';
 import '../../../core/routes/app_router.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -22,6 +22,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.cream,
       appBar: AppBar(
@@ -42,7 +43,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
               // Title
               Text(
-                'Forgot password?',
+                l10n.forgotPasswordTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -55,7 +56,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
               // Subtitle
               Text(
-                "Enter your email address and we'll send you instructions to reset your password.",
+                l10n.forgotPasswordSubtitle,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -68,7 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
               // Email Field Label
               Text(
-                AppStrings.emailLabel,
+                l10n.emailLabel,
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -90,7 +91,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  hintText: AppStrings.emailHint,
+                  hintText: l10n.emailHint,
                   hintStyle: GoogleFonts.poppins(
                     fontSize: 14,
                     color: const Color(0xFFA1A1AA),
@@ -148,7 +149,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     Navigator.of(context).pushNamed(AppRoutes.checkEmail);
                   },
                   child: Text(
-                    'Send instructions',
+                    l10n.sendInstructionsButton,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -165,7 +166,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Text(
-                    'Back to login',
+                    l10n.backToLogIn,
                     style: GoogleFonts.poppins(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w500,
